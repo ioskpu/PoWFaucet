@@ -10,6 +10,7 @@ import { MainnetWalletModule } from "./mainnet-wallet/MainnetWalletModule.js";
 import { PassportModule } from "./passport/PassportModule.js";
 import { PoWModule } from "./pow/PoWModule.js";
 import { RecurringLimitsModule } from "./recurring-limits/RecurringLimitsModule.js";
+import { SiweModule } from "./siwe/SiweModule.js";
 import { VoucherModule } from "./voucher/VoucherModule.js";
 import { WhitelistModule } from "./whitelist/WhitelistModule.js";
 import { ZupassModule } from "./zupass/ZupassModule.js";
@@ -27,6 +28,7 @@ export const MODULE_CLASSES = {
   "passport": PassportModule,
   "pow": PoWModule,
   "recurring-limits": RecurringLimitsModule,
+  "siwe": SiweModule,
   "voucher": VoucherModule,
   "whitelist": WhitelistModule,
   "zupass": ZupassModule,

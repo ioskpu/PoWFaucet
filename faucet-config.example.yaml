@@ -140,6 +140,35 @@ modules:
     # require captcha to start claim payout (default: false)
     checkBalanceClaim: false
   
+  ## Sign-In with Ethereum (SIWE) Authentication
+  siwe:
+    # enable / disable SIWE authentication
+    enabled: false
+
+    # domain for SIWE message (should match your faucet domain)
+    domain: "faucet.example.com"
+
+    # URI for SIWE message
+    uri: "https://faucet.example.com"
+
+    # nonce expiration time (seconds)
+    nonceExpiration: 300  # 5 minutes
+
+    # SIWE session expiration time (seconds)
+    sessionExpiration: 86400  # 24 hours
+
+    # require SIWE authentication to use faucet
+    required: false
+
+    # reward factor for SIWE authenticated users (1.5 = 50% bonus)
+    rewardFactor: 1.5
+
+    # restrictions for SIWE authenticated wallets
+    restrictions:
+      - limitCount: 5
+        limitAmount: 5000000000000000000  # 5 ETH
+        duration: 86400  # 1 day
+
   ## ENS Name
   ensname:
     enabled: true
