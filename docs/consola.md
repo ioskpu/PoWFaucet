@@ -1,96 +1,53 @@
- 
-[Region: us-west1]
-=========================
-Using Detected Dockerfile
-=========================
-context: 7d97-Gh_x
-internal
-load build definition from Dockerfile
-0ms
-internal
-load metadata for docker.io/library/node:22-slim
-410ms
-auth
-library/node:pull token for registry-1.docker.io
-0ms
-internal
-load .dockerignore
-0ms
-internal
-load build context
-0ms
-build-client-env
-FROM docker.io/library/node:22-slim@sha256:7378f5a4830ef48eb36d1abf4ef398391db562b5c41a0bded83192fbcea21cc8 cached
-5ms
-build-client-env
-WORKDIR /build cached
-237ms
-stage-2
-WORKDIR /app cached
-237ms
-build-server-env
-RUN npm install cached
-0ms
-build-server-env
-COPY package*.json ./ cached
-0ms
-stage-2
-RUN update-ca-certificates cached
-0ms
-stage-2
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates cached
-0ms
-build-client-env
-RUN cd faucet-client && node ./build-client.js cached
-0ms
-build-client-env
-COPY ./faucet-client faucet-client cached
-0ms
-build-client-env
-RUN cd faucet-client && npm install cached
-0ms
-build-client-env
-COPY ./static static cached
-0ms
-build-client-env
-COPY ./libs libs cached
-0ms
-build-client-env
-COPY faucet-client/package*.json ./faucet-client/ cached
-0ms
-stage-2
-COPY --from=build-server-env /build/bundle ./bundle cached
-0ms
-build-server-env
-RUN npm run bundle cached
-0ms
-build-server-env
-COPY ./src src cached
-0ms
-build-server-env
-COPY ./webpack.config.js . cached
-0ms
-build-server-env
-COPY ./tsconfig.json . cached
-0ms
-build-server-env
-COPY ./libs libs cached
-0ms
-stage-2
-COPY ./faucet-config.yaml .
-0ms
-stage-2
-COPY ./faucet-config.example.yaml . cached
-0ms
-stage-2
-COPY --from=build-client-env /build/static ./static cached
-0ms
-Dockerfile:30
--------------------
-28 |     COPY --from=build-client-env /build/static ./static
-29 |     COPY ./faucet-config.example.yaml .
-30 | >>> COPY ./faucet-config.yaml .
-31 |     RUN mkdir -p /app/data && chmod 777 /app/data
-32 |     RUN cp ./static/index.html ./static/index.seo.html && chmod 777 ./static/index.seo.html
--------------------
-ERROR: failed to build: failed to solve: failed to compute cache key: failed to calculate checksum of ref r7aempy18tllkdoamnqntzrvw::y0ai9l71ch78f0n1vtxpmlavb: "/faucet-config.yaml": not found
+Starting Container
+2026-01-12 21:37:46  INFO     Upgraded FaucetStore schema from version 0 to version 1
+2026-01-12 21:37:45  INFO     Loaded faucet config from yaml file: /app/faucet-config.yaml
+2026-01-12 21:37:45  INFO     Initializing PoWFaucet v2.4.2 (AppBasePath: /app, InternalBasePath: /app)
+2026-01-12 21:37:46  INFO     Current FaucetStore schema version: uninitialized
+2026-01-12 21:37:46  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:37:46  INFO     Enabled module: captcha
+2026-01-12 21:37:46  INFO     Enabled module: ensname
+2026-01-12 21:37:46  INFO     Enabled module: ipinfo
+2026-01-12 21:37:46  INFO     Enabled module: ethinfo
+2026-01-12 21:37:46  INFO     Enabled module: faucet-balance
+2026-01-12 21:37:46  INFO     Enabled module: faucet-outflow
+2026-01-12 21:37:46  INFO     Enabled module: recurring-limits
+2026-01-12 21:37:46  INFO     Enabled module: concurrency-limit
+2026-01-12 21:37:46  INFO     Enabled module: pow
+2026-01-12 21:37:46  INFO     Faucet initialization complete.
+2026-01-12 21:37:58  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:38:00  INFO     Faucet Process                                     Stats: CPU: 11.35%, Memory: 58.52 MB/64.35 MB,   Event Loop Lag:  0.33ms
+2026-01-12 21:38:10  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:38:22  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:38:34  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:38:46  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:38:58  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:39:00  INFO     Faucet Process                                     Stats: CPU: 0.31%,  Memory: 42.38 MB/44.13 MB,   Event Loop Lag:  0.09ms
+2026-01-12 21:39:10  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:39:22  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:39:34  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:39:46  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:39:58  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:40:00  INFO     # STATS # clients: 0, sessions: 0 (0 H/s, 0 idle), shares: 0 (0 HolETH), verify: 0 (reward: 0 HolETH, missed: 0 / -0 HolETH), claims: 0 (0 HolETH)
+2026-01-12 21:40:00  INFO     Faucet Process                                     Stats: CPU: 0.13%,  Memory: 43.08 MB/45.63 MB,   Event Loop Lag:  0.10ms
+2026-01-12 21:40:10  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:40:22  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:40:34  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:40:46  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:40:58  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:41:00  INFO     Faucet Process                                     Stats: CPU: 0.09%,  Memory: 43.31 MB/46.13 MB,   Event Loop Lag:  0.06ms
+2026-01-12 21:41:10  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:41:22  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:41:34  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:41:46  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:41:58  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:42:00  INFO     Faucet Process                                     Stats: CPU: 0.08%,  Memory: 44.05 MB/45.63 MB,   Event Loop Lag:  0.09ms
+2026-01-12 21:42:10  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:42:23  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:42:35  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:42:47  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:42:59  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:43:00  INFO     Faucet Process                                     Stats: CPU: 0.10%,  Memory: 44.27 MB/46.13 MB,   Event Loop Lag:  0.08ms
+2026-01-12 21:43:11  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:43:23  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:43:35  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 21:43:47  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io

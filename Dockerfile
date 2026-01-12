@@ -26,10 +26,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
 RUN update-ca-certificates
 COPY --from=build-server-env /build/bundle ./bundle
 COPY --from=build-client-env /build/static ./static
-COPY ./faucet-config.example.yaml .
-RUN cp ./faucet-config.example.yaml ./faucet-config.yaml
+COPY ./faucet-config.example.yaml ./faucet-config.yaml
+COPY ./docker-entrypoint.sh .
+RUN chmod +x /app/docker-entrypoint.sh
 RUN mkdir -p /app/data && chmod 777 /app/data
 RUN cp ./static/index.html ./static/index.seo.html && chmod 777 ./static/index.seo.html
 
 EXPOSE 8080
-ENTRYPOINT [ "node", "--no-deprecation", "bundle/powfaucet.cjs", "--config", "/app/faucet-config.yaml" ]
+ENTRYPOINT [ "/app/docker-entrypoint.sh" ]
