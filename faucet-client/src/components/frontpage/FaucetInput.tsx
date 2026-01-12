@@ -3,6 +3,7 @@ import { IFaucetConfig } from '../../common/FaucetConfig';
 import { IFaucetContext } from '../../common/FaucetContext';
 import { FaucetCaptcha } from '../shared/FaucetCaptcha';
 import { GithubLogin } from './github/GithubLogin';
+import { SiweLogin } from './siwe/SiweLogin';
 import { ZupassLogin } from './zupass/ZupassLogin';
 import VoucherInput, { IVoucherInputRef } from './voucher/VoucherInput';
 
@@ -21,6 +22,7 @@ export interface IFaucetInputState {
 export class FaucetInput extends React.PureComponent<IFaucetInputProps, IFaucetInputState> {
   private faucetCaptcha = React.createRef<FaucetCaptcha>();
   private githubLogin = React.createRef<GithubLogin>();
+  private siweLogin = React.createRef<SiweLogin>();
   private zupassLogin = React.createRef<ZupassLogin>();
   private voucherInput = React.createRef<IVoucherInputRef>();
 
@@ -35,6 +37,7 @@ export class FaucetInput extends React.PureComponent<IFaucetInputProps, IFaucetI
 
 	public render(): React.ReactElement<IFaucetInputProps> {
     let needGithubAuth = !!this.props.faucetConfig.modules.github;
+    let needSiweAuth = !!this.props.faucetConfig.modules.siwe;
     let needZupassAuth = !!this.props.faucetConfig.modules.zupass && !!this.props.faucetConfig.modules.zupass.event;
     let needVoucher = !!this.props.faucetConfig.modules.voucher;
     let requestCaptcha = !!this.props.faucetConfig.modules.captcha?.requiredForStart;
@@ -69,6 +72,14 @@ export class FaucetInput extends React.PureComponent<IFaucetInputProps, IFaucetI
             faucetConfig={this.props.faucetConfig} 
             faucetContext={this.props.faucetContext} 
             ref={this.githubLogin}
+          />
+        : null}
+        {needSiweAuth ?
+          <SiweLogin
+            faucetConfig={this.props.faucetConfig}
+            faucetContext={this.props.faucetContext}
+            targetAddr={this.state.targetAddr}
+            ref={this.siweLogin}
           />
         : null}
         {needZupassAuth ? 
@@ -127,6 +138,13 @@ export class FaucetInput extends React.PureComponent<IFaucetInputProps, IFaucetI
       }
       if(this.props.faucetConfig.modules.github) {
         inputData.githubToken = await this.githubLogin.current?.getToken();
+      }
+      if(this.props.faucetConfig.modules.siwe) {
+        const siweAuth = this.siweLogin.current?.getAuthInfo();
+        if (siweAuth) {
+          inputData.siweAddress = siweAuth.address;
+          inputData.siweToken = siweAuth.token;
+        }
       }
       if(this.props.faucetConfig.modules.zupass && this.props.faucetConfig.modules.zupass.event) {
         inputData.zupassToken = await this.zupassLogin.current?.getToken();

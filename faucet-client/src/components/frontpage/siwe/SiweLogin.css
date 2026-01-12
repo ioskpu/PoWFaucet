@@ -1,0 +1,77 @@
+.faucet-auth-siwe {
+  margin: 15px 0;
+  padding: 12px 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.faucet-auth-siwe .auth-icon {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 10px;
+}
+
+.faucet-auth-siwe .logo-siwe {
+  width: 24px;
+  height: 24px;
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23627EEA"><path d="M12 2L4 12l8 10 8-10L12 2zm0 3.5L17.5 12 12 18.5 6.5 12 12 5.5z"/></svg>');
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.faucet-auth-siwe .auth-field {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.faucet-auth-siwe .auth-noauth {
+  cursor: pointer;
+}
+
+.faucet-auth-siwe .auth-noauth:hover {
+  text-decoration: underline;
+}
+
+.faucet-auth-siwe .auth-profile {
+  color: #198754;
+}
+
+.faucet-auth-siwe .auth-info {
+  font-size: 0.9em;
+}
+
+.faucet-auth-siwe .wallet-address {
+  font-family: monospace;
+  font-size: 0.85em;
+  background: #e9ecef;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.faucet-auth-siwe .inline-spinner {
+  display: inline-block;
+  margin-right: 5px;
+}
+
+.faucet-auth-siwe .inline-spinner .spinner {
+  width: 16px;
+  height: 16px;
+}
+
+.faucet-auth-siwe .auth-error {
+  color: #dc3545;
+  font-size: 0.85em;
+  margin-top: 5px;
+}
+
+.faucet-auth-siwe .siwe-bonus {
+  font-size: 0.8em;
+  color: #6c757d;
+  margin-top: 3px;
+}
+
+.faucet-auth-siwe .siwe-bonus .bonus-value {
+  color: #198754;
+  font-weight: bold;
+}

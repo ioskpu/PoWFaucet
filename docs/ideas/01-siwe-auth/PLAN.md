@@ -63,18 +63,23 @@ src/modules/siwe/
 ---
 
 ### Fase 4: Interfaz de Usuario (Cliente)
-**Estado:** ⏳ Pendiente
+**Estado:** ✅ Completado
 
-- [ ] Crear componente React para botón "Sign-In with Ethereum"
-- [ ] Integrar con providers Web3 (MetaMask, WalletConnect, etc.)
-- [ ] Mostrar estado de autenticación en UI
-- [ ] Manejar errores de firma en UI
+- [x] Crear componente React `SiweLogin.tsx`
+- [x] Crear estilos `SiweLogin.css`
+- [x] Integrar con providers Web3 (ethers.js + MetaMask)
+- [x] Mostrar estado de autenticación en UI
+- [x] Manejar errores de firma en UI
+- [x] Integrar en `FaucetInput.tsx`
+- [x] Instalar dependencia `ethers` en cliente
 
-**Archivos cliente a modificar:**
+**Archivos creados/modificados:**
 ```
-faucet-client/src/components/
-├── SiweLogin.tsx (nuevo)
-└── FaucetInput.tsx (modificar)
+faucet-client/src/components/frontpage/siwe/
+├── SiweLogin.tsx
+└── SiweLogin.css
+
+faucet-client/src/components/frontpage/FaucetInput.tsx (modificado)
 ```
 
 ---
@@ -142,7 +147,7 @@ modules:
 | 12-Ene-2026 | 1 | Crear estructura base | ✅ |
 | 12-Ene-2026 | 2 | Implementar lógica SIWE | ✅ |
 | 12-Ene-2026 | 3 | Integrar hooks | ✅ |
-| - | 4 | Crear UI cliente | ⏳ |
+| 12-Ene-2026 | 4 | Crear UI cliente | ✅ |
 | - | 5 | Testing y docs | ⏳ |
 
 ---
@@ -173,6 +178,6 @@ modules:
 
 ## Próximo Paso
 
-Continuar con **Fase 4**: Crear la interfaz de usuario (componentes React en faucet-client).
+Continuar con **Fase 5**: Testing y documentación.
 
-¿Procedemos con la implementación del cliente?
+¿Procedemos con los tests o prefieres probar primero el módulo manualmente?
