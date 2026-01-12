@@ -27,7 +27,9 @@ RUN update-ca-certificates
 COPY --from=build-server-env /build/bundle ./bundle
 COPY --from=build-client-env /build/static ./static
 COPY ./faucet-config.example.yaml .
+COPY ./faucet-config.yaml .
+RUN mkdir -p /app/data && chmod 777 /app/data
 RUN cp ./static/index.html ./static/index.seo.html && chmod 777 ./static/index.seo.html
 
 EXPOSE 8080
-ENTRYPOINT [ "node", "--no-deprecation", "bundle/powfaucet.cjs" ]
+ENTRYPOINT [ "node", "--no-deprecation", "bundle/powfaucet.cjs", "--config", "/app/faucet-config.yaml" ]

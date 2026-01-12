@@ -1,0 +1,10 @@
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = "node --no-deprecation bundle/powfaucet.cjs --config /app/faucet-config.yaml"
+healthcheckPath = "/api/getFaucetConfig"
+healthcheckTimeout = 30
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
