@@ -1,53 +1,50 @@
+Filter and search logs
+You reached the start of the range
+Jan 12, 2026, 5:50 PM
 Starting Container
-2026-01-12 21:37:46  INFO     Upgraded FaucetStore schema from version 0 to version 1
-2026-01-12 21:37:45  INFO     Loaded faucet config from yaml file: /app/faucet-config.yaml
-2026-01-12 21:37:45  INFO     Initializing PoWFaucet v2.4.2 (AppBasePath: /app, InternalBasePath: /app)
-2026-01-12 21:37:46  INFO     Current FaucetStore schema version: uninitialized
-2026-01-12 21:37:46  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:37:46  INFO     Enabled module: captcha
-2026-01-12 21:37:46  INFO     Enabled module: ensname
-2026-01-12 21:37:46  INFO     Enabled module: ipinfo
-2026-01-12 21:37:46  INFO     Enabled module: ethinfo
-2026-01-12 21:37:46  INFO     Enabled module: faucet-balance
-2026-01-12 21:37:46  INFO     Enabled module: faucet-outflow
-2026-01-12 21:37:46  INFO     Enabled module: recurring-limits
-2026-01-12 21:37:46  INFO     Enabled module: concurrency-limit
-2026-01-12 21:37:46  INFO     Enabled module: pow
-2026-01-12 21:37:46  INFO     Faucet initialization complete.
-2026-01-12 21:37:58  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:38:00  INFO     Faucet Process                                     Stats: CPU: 11.35%, Memory: 58.52 MB/64.35 MB,   Event Loop Lag:  0.33ms
-2026-01-12 21:38:10  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:38:22  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:38:34  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:38:46  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:38:58  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:39:00  INFO     Faucet Process                                     Stats: CPU: 0.31%,  Memory: 42.38 MB/44.13 MB,   Event Loop Lag:  0.09ms
-2026-01-12 21:39:10  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:39:22  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:39:34  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:39:46  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:39:58  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:40:00  INFO     # STATS # clients: 0, sessions: 0 (0 H/s, 0 idle), shares: 0 (0 HolETH), verify: 0 (reward: 0 HolETH, missed: 0 / -0 HolETH), claims: 0 (0 HolETH)
-2026-01-12 21:40:00  INFO     Faucet Process                                     Stats: CPU: 0.13%,  Memory: 43.08 MB/45.63 MB,   Event Loop Lag:  0.10ms
-2026-01-12 21:40:10  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:40:22  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:40:34  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:40:46  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:40:58  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:41:00  INFO     Faucet Process                                     Stats: CPU: 0.09%,  Memory: 43.31 MB/46.13 MB,   Event Loop Lag:  0.06ms
-2026-01-12 21:41:10  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:41:22  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:41:34  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:41:46  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:41:58  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:42:00  INFO     Faucet Process                                     Stats: CPU: 0.08%,  Memory: 44.05 MB/45.63 MB,   Event Loop Lag:  0.09ms
-2026-01-12 21:42:10  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:42:23  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:42:35  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:42:47  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:42:59  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:43:00  INFO     Faucet Process                                     Stats: CPU: 0.10%,  Memory: 44.27 MB/46.13 MB,   Event Loop Lag:  0.08ms
-2026-01-12 21:43:11  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:43:23  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:43:35  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
-2026-01-12 21:43:47  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: request to https://rpc.holesky.ethpandaops.io/ failed, reason: getaddrinfo ENOTFOUND rpc.holesky.ethpandaops.io
+2026-01-12 22:50:54  INFO     Loaded faucet config from yaml file: /app/faucet-config.yaml
+2026-01-12 22:50:54  INFO     Initializing PoWFaucet v2.4.2 (AppBasePath: /app, InternalBasePath: /app)
+2026-01-12 22:50:55  INFO     Current FaucetStore schema version: uninitialized
+2026-01-12 22:50:55  INFO     Upgraded FaucetStore schema from version 0 to version 1
+2026-01-12 22:50:55  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: invalid json response body at https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY reason: Unexpected token 'M', "Must be au"... is not valid JSON
+2026-01-12 22:50:55  INFO     Enabled module: captcha
+2026-01-12 22:50:55  INFO     Enabled module: ensname
+2026-01-12 22:50:55  INFO     Enabled module: ipinfo
+2026-01-12 22:50:55  INFO     Enabled module: ethinfo
+2026-01-12 22:50:55  INFO     Enabled module: faucet-balance
+2026-01-12 22:50:55  INFO     Enabled module: faucet-outflow
+2026-01-12 22:50:55  INFO     Enabled module: recurring-limits
+2026-01-12 22:50:55  INFO     Enabled module: concurrency-limit
+2026-01-12 22:50:55  INFO     Enabled module: pow
+2026-01-12 22:50:55  INFO     Faucet initialization complete.
+2026-01-12 22:51:00  INFO     Faucet Process                                     Stats: CPU: 21.46%, Memory: 58.57 MB/64.10 MB,   Event Loop Lag:  0.24ms
+2026-01-12 22:51:07  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: invalid json response body at https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY reason: Unexpected token 'M', "Must be au"... is not valid JSON
+2026-01-12 22:51:19  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: invalid json response body at https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY reason: Unexpected token 'M', "Must be au"... is not valid JSON
+2026-01-12 22:51:31  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: invalid json response body at https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY reason: Unexpected token 'M', "Must be au"... is not valid JSON
+2026-01-12 22:51:43  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: invalid json response body at https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY reason: Unexpected token 'M', "Must be au"... is not valid JSON
+2026-01-12 22:51:55  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: invalid json response body at https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY reason: Unexpected token 'M', "Must be au"... is not valid JSON
+2026-01-12 22:52:00  INFO     Faucet Process                                     Stats: CPU: 0.54%,  Memory: 42.66 MB/44.13 MB,   Event Loop Lag:  0.07ms
+2026-01-12 22:52:07  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: invalid json response body at https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY reason: Unexpected token 'M', "Must be au"... is not valid JSON
+2026-01-12 22:52:19  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: invalid json response body at https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY reason: Unexpected token 'M', "Must be au"... is not valid JSON
+2026-01-12 22:52:31  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: invalid json response body at https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY reason: Unexpected token 'M', "Must be au"... is not valid JSON
+2026-01-12 22:52:43  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: invalid json response body at https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY reason: Unexpected token 'M', "Must be au"... is not valid JSON
+2026-01-12 22:52:55  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: invalid json response body at https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY reason: Unexpected token 'M', "Must be au"... is not valid JSON
+2026-01-12 22:53:00  INFO     Faucet Process                                     Stats: CPU: 0.18%,  Memory: 43.09 MB/45.88 MB,   Event Loop Lag:  0.06ms
+2026-01-12 22:53:07  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: invalid json response body at https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY reason: Unexpected token 'M', "Must be au"... is not valid JSON
+2026-01-12 22:53:19  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: invalid json response body at https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY reason: Unexpected token 'M', "Must be au"... is not valid JSON
+2026-01-12 22:53:31  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: invalid json response body at https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY reason: Unexpected token 'M', "Must be au"... is not valid JSON
+2026-01-12 22:53:43  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: invalid json response body at https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY reason: Unexpected token 'M', "Must be au"... is not valid JSON
+2026-01-12 22:53:55  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: invalid json response body at https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY reason: Unexpected token 'M', "Must be au"... is not valid JSON
+2026-01-12 22:54:00  INFO     Faucet Process                                     Stats: CPU: 0.15%,  Memory: 43.53 MB/45.13 MB,   Event Loop Lag:  0.06ms
+2026-01-12 22:54:07  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: invalid json response body at https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY reason: Unexpected token 'M', "Must be au"... is not valid JSON
+2026-01-12 22:54:19  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: invalid json response body at https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY reason: Unexpected token 'M', "Must be au"... is not valid JSON
+2026-01-12 22:54:31  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: invalid json response body at https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY reason: Unexpected token 'M', "Must be au"... is not valid JSON
+2026-01-12 22:54:43  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: invalid json response body at https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY reason: Unexpected token 'M', "Must be au"... is not valid JSON
+2026-01-12 22:54:55  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: invalid json response body at https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY reason: Unexpected token 'M', "Must be au"... is not valid JSON
+2026-01-12 22:55:00  INFO     Faucet Process                                     Stats: CPU: 0.15%,  Memory: 43.93 MB/45.63 MB,   Event Loop Lag:  0.13ms
+2026-01-12 22:55:07  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: invalid json response body at https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY reason: Unexpected token 'M', "Must be au"... is not valid JSON
+2026-01-12 22:55:19  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: invalid json response body at https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY reason: Unexpected token 'M', "Must be au"... is not valid JSON
+2026-01-12 22:55:31  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: invalid json response body at https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY reason: Unexpected token 'M', "Must be au"... is not valid JSON
+2026-01-12 22:55:43  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: invalid json response body at https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY reason: Unexpected token 'M', "Must be au"... is not valid JSON
+2026-01-12 22:55:55  ERROR    Error loading wallet state for 0xCA9456991E0AA5d5321e88Bba44d405aAb401193: FetchError: invalid json response body at https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY reason: Unexpected token 'M', "Must be au"... is not valid JSON
+2026-01-12 22:56:00  INFO     Faucet Process                                     Stats: CPU: 0.17%,  Memory: 44.34 MB/46.13 MB,   Event Loop Lag:  0.07ms

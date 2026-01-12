@@ -22,7 +22,7 @@ RUN cd faucet-client && node ./build-client.js
 # final stage
 FROM node:22-slim
 WORKDIR /app
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates bash
 RUN update-ca-certificates
 COPY --from=build-server-env /build/bundle ./bundle
 COPY --from=build-client-env /build/static ./static
@@ -33,4 +33,4 @@ RUN mkdir -p /app/data && chmod 777 /app/data
 RUN cp ./static/index.html ./static/index.seo.html && chmod 777 ./static/index.seo.html
 
 EXPOSE 8080
-ENTRYPOINT [ "/app/docker-entrypoint.sh" ]
+ENTRYPOINT [ "/bin/bash", "/app/docker-entrypoint.sh" ]
