@@ -52,8 +52,8 @@ faucetHomeHtml: |
 faucetSecret: "RandomStringThatShouldBeVerySecret!"
 
 # ETH execution layer RPC host
-#ethRpcHost: "http://127.0.0.1:8545/"
-ethRpcHost: "https://eth-sepolia.g.alchemy.com/v2/demo"
+# IMPORTANTE: Configurar via variable de entorno ETH_RPC_HOST en Railway
+ethRpcHost: "https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY"
 
 # faucet wallet private key (hex, without 0x prefix)
 ethWalletKey: "feedbeef12340000feedbeef12340000feedbeef12340000feedbeef12340000"
