@@ -146,10 +146,10 @@ modules:
     enabled: false
 
     # domain for SIWE message (should match your faucet domain)
-    domain: "faucet.example.com"
+    #domain: "faucet.example.com"
 
     # URI for SIWE message
-    uri: "https://faucet.example.com"
+    #uri: "https://faucet.example.com"
 
     # nonce expiration time (seconds)
     nonceExpiration: 300  # 5 minutes
