@@ -33,4 +33,4 @@ RUN mkdir -p /app/data && chmod 777 /app/data
 RUN cp ./static/index.html ./static/index.seo.html && chmod 777 ./static/index.seo.html
 
 EXPOSE 8080
-ENTRYPOINT [ "/bin/bash", "/app/docker-entrypoint.sh" ]
+CMD [ "/bin/bash", "/app/docker-entrypoint.sh" ]
