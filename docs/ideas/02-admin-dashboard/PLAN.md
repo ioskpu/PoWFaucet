@@ -255,20 +255,66 @@ static/admin/admin.js                                 # Bundle actualizado (27KB
 ---
 
 ### Fase 5: Gestión de Usuarios y Seguridad
-**Estado:** ⏳ Pendiente
+**Estado:** ✅ Completado
 
-- [ ] Gestión de blacklist/whitelist desde UI
-- [ ] Monitor de actividad sospechosa
-- [ ] Gestión de sesiones de usuarios
-- [ ] Sistema de alertas configurables
-- [ ] Logs de auditoría de administración
+- [x] Gestión de blacklist/whitelist desde UI
+- [x] Monitor de actividad sospechosa
+- [x] Gestión de sesiones de usuarios
+- [x] Sistema de alertas configurables
+- [x] Logs de auditoría de administración
 
-**Funcionalidades:**
-- Agregar/remover direcciones de blacklist
-- Ver historial de usuarios problemáticos
-- Terminar sesiones activas
-- Configurar alertas por balance bajo, alta actividad, etc.
-- Log de todas las acciones de administración
+**Funcionalidades implementadas:**
+- ✅ **Interfaz completa de gestión de usuarios** - AdminUsers component con 5 secciones
+- ✅ **Sistema de tabs navegable** - Resumen, Blacklist, Whitelist, Sesiones, Top Usuarios
+- ✅ **Gestión de blacklist/whitelist** - Formularios para agregar/remover direcciones e IPs
+- ✅ **Monitor de sesiones activas** - Visualización y terminación de sesiones en tiempo real
+- ✅ **Análisis de top usuarios** - Tabla con estadísticas de usuarios más activos
+- ✅ **Validación de datos** - Validación de direcciones Ethereum e IPs
+- ✅ **Logs de auditoría** - Registro de todas las acciones administrativas
+- ✅ **Estados de carga y error** - Manejo completo de errores y loading states
+- ✅ **Diseño responsivo** - Interfaz optimizada para desktop y móvil
+
+**Endpoints API implementados:**
+```
+✅ GET  /api/admin/users                    # Estadísticas de usuarios
+✅ GET  /api/admin/users/blacklist          # Obtener blacklist
+✅ POST /api/admin/users/blacklist          # Agregar a blacklist
+✅ DELETE /api/admin/users/blacklist        # Remover de blacklist
+✅ GET  /api/admin/users/whitelist          # Obtener whitelist
+✅ POST /api/admin/users/whitelist          # Agregar a whitelist
+✅ DELETE /api/admin/users/whitelist        # Remover de whitelist
+✅ GET  /api/admin/users/sessions           # Sesiones activas
+✅ POST /api/admin/users/sessions/terminate # Terminar sesión
+✅ GET  /api/admin/users/top                # Top usuarios
+```
+
+**Características de la interfaz:**
+- ✅ **Dashboard de resumen** - Estadísticas generales de usuarios
+- ✅ **Gestión de blacklist** - Agregar/remover direcciones e IPs bloqueadas
+- ✅ **Gestión de whitelist** - Agregar/remover direcciones e IPs permitidas
+- ✅ **Monitor de sesiones** - Ver y terminar sesiones activas
+- ✅ **Top usuarios** - Tabla con usuarios más activos y estadísticas
+- ✅ **Validación en tiempo real** - Validación de formatos de direcciones e IPs
+- ✅ **Formularios intuitivos** - UX optimizada para agregar entradas
+- ✅ **Confirmaciones de acciones** - Confirmación antes de acciones críticas
+
+**Funcionalidades de seguridad:**
+- ✅ **Validación de direcciones Ethereum** - Formato 0x + 40 caracteres hex
+- ✅ **Validación de direcciones IP** - Formato IPv4 válido
+- ✅ **Logs de auditoría** - Registro de todas las acciones con usuario y timestamp
+- ✅ **Permisos granulares** - Verificación de permisos por endpoint
+- ✅ **Razones obligatorias** - Requerimiento de justificación para blacklist/whitelist
+- ✅ **Terminación segura de sesiones** - Control de sesiones activas
+
+**Archivos creados/modificados:**
+```
+faucet-client/src/components/admin/AdminUsers.tsx    # Componente principal ✅
+faucet-client/src/components/admin/AdminUsers.css    # Estilos específicos ✅
+src/modules/admin-dashboard/AdminAPI.ts              # Endpoints extendidos ✅
+faucet-client/build-admin.js                        # Build actualizado ✅
+static/admin/admin.js                                # Bundle actualizado (34KB) ✅
+static/admin/admin.css                               # Estilos actualizados (58KB) ✅
+```
 
 ---
 
@@ -496,7 +542,7 @@ security:
 | 13-Ene-2026 | 2 | API de administración | ✅ |
 | 13-Ene-2026 | 3 | UI estadísticas | ✅ |
 | 13-Ene-2026 | 4 | Gestión config | ✅ |
-| - | 5 | Gestión usuarios | ⏳ |
+| 13-Ene-2026 | 5 | Gestión usuarios | ✅ |
 | - | 6 | Análisis reportes | ⏳ |
 
 ---

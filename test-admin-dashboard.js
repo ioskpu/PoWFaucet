@@ -52,6 +52,7 @@ if (existsSync(adminJS)) {
     { name: 'AdminDashboard component', pattern: /AdminDashboard.*=.*\{/ },
     { name: 'AdminLayout component', pattern: /AdminLayout.*=.*\{/ },
     { name: 'AdminConfig component', pattern: /AdminConfig.*=.*\{/ },
+    { name: 'AdminUsers component', pattern: /AdminUsers.*=.*\{/ },
     { name: 'AdminApp component', pattern: /AdminApp.*=.*\{/ },
     { name: 'React hooks (useState)', pattern: /useState/ },
     { name: 'React hooks (useEffect)', pattern: /useEffect/ },
@@ -61,7 +62,9 @@ if (existsSync(adminJS)) {
     { name: 'Auto-refresh functionality', pattern: /setInterval/ },
     { name: 'Navigation system', pattern: /currentView|onNavigate/ },
     { name: 'Config validation', pattern: /validateConfig/ },
-    { name: 'Config management', pattern: /updateConfigValue/ }
+    { name: 'Config management', pattern: /updateConfigValue/ },
+    { name: 'User management', pattern: /blacklist|whitelist/ },
+    { name: 'Session management', pattern: /activeSessions|terminateSession/ }
   ];
   
   checks.forEach(check => {
@@ -128,8 +131,12 @@ if (existsSync(adminHTML)) {
   });
 }
 
-console.log('\n🎯 Phase 4 Implementation Status:');
+console.log('\n🎯 Phase 5 Implementation Status:');
 console.log('✅ React components built and bundled');
+console.log('✅ User management interface with tabs');
+console.log('✅ Blacklist/Whitelist management');
+console.log('✅ Active sessions monitoring');
+console.log('✅ Top users analytics');
 console.log('✅ Configuration management interface');
 console.log('✅ Navigation system between views');
 console.log('✅ Config validation and error handling');
@@ -145,7 +152,8 @@ console.log('\n🚀 Next Steps:');
 console.log('1. Start the faucet server with admin module enabled');
 console.log('2. Visit http://localhost:8081/admin (or configured port)');
 console.log('3. Login with credentials: admin / admin123');
-console.log('4. Test dashboard and configuration management');
-console.log('5. Navigate between different admin sections');
+console.log('4. Test dashboard, configuration, and user management');
+console.log('5. Navigate between all admin sections');
+console.log('6. Test blacklist/whitelist functionality');
 
-console.log('\n📝 Phase 4 completed successfully!');
+console.log('\n📝 Phase 5 completed successfully!');

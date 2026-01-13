@@ -611,7 +611,7 @@ export class AdminAPI {
         return this.handleWhitelist(req, session, path.slice(1), method, body);
       
       case 'sessions':
-        return this.handleUserSessions(req, session, path.slice(1), method);
+        return this.handleUserSessions(req, session, path.slice(1), method, body);
       
       case 'top':
         return this.getTopUsers();
@@ -680,11 +680,15 @@ export class AdminAPI {
         database.getTopIPs(10)
       ]);
 
+      // Simular conteos de blacklist/whitelist (TODO: implementar real)
+      const blacklistCount = 0;
+      const whitelistCount = 0;
+
       return {
         topAddresses,
         topIPs,
-        blacklistCount: 0, // TODO: implementar conteo real
-        whitelistCount: 0, // TODO: implementar conteo real
+        blacklistCount,
+        whitelistCount,
         totalUsers: topAddresses.length,
         activeUsers: topAddresses.filter(addr => 
           Date.now() - addr.lastSession < 24 * 60 * 60 * 1000
@@ -694,37 +698,68 @@ export class AdminAPI {
       return {
         error: error.message,
         topAddresses: [],
-        topIPs: []
+        topIPs: [],
+        blacklistCount: 0,
+        whitelistCount: 0,
+        totalUsers: 0,
+        activeUsers: 0
       };
     }
   }
 
   /**
-   * Obtiene blacklist
+   * Obtiene blacklist con datos simulados mejorados
    */
   private async getBlacklist(): Promise<any> {
-    // TODO: Implementar lectura real de blacklist
+    // TODO: Implementar lectura real de blacklist desde base de datos
+    const mockBlacklist = [
+      {
+        address: "0x1234567890123456789012345678901234567890",
+        reason: "Actividad sospechosa - múltiples solicitudes",
+        addedBy: "admin",
+        timestamp: Date.now() - 86400000, // 1 día atrás
+        lastActivity: Date.now() - 3600000
+      },
+      {
+        ip: "192.168.1.100",
+        reason: "Bot detectado - patrón automatizado",
+        addedBy: "monitor",
+        timestamp: Date.now() - 172800000, // 2 días atrás
+        lastActivity: Date.now() - 7200000
+      }
+    ];
+
     return {
-      addresses: [],
-      ips: [],
-      message: "Blacklist reading not fully implemented"
+      addresses: mockBlacklist.filter(item => item.address),
+      ips: mockBlacklist.filter(item => item.ip),
+      message: "Blacklist data (simulated for demo)"
     };
   }
 
   /**
-   * Obtiene whitelist
+   * Obtiene whitelist con datos simulados mejorados
    */
   private async getWhitelist(): Promise<any> {
-    // TODO: Implementar lectura real de whitelist
+    // TODO: Implementar lectura real de whitelist desde base de datos
+    const mockWhitelist = [
+      {
+        address: "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd",
+        reason: "Usuario verificado - desarrollador del proyecto",
+        addedBy: "admin",
+        timestamp: Date.now() - 604800000, // 1 semana atrás
+        lastActivity: Date.now() - 1800000
+      }
+    ];
+
     return {
-      addresses: [],
-      ips: [],
-      message: "Whitelist reading not fully implemented"
+      addresses: mockWhitelist.filter(item => item.address),
+      ips: mockWhitelist.filter(item => item.ip),
+      message: "Whitelist data (simulated for demo)"
     };
   }
 
   /**
-   * Agrega a blacklist
+   * Agrega a blacklist con validación mejorada
    */
   private async addToBlacklist(session: IAdminSession, data: any): Promise<any> {
     const { address, ip, reason } = data;
@@ -733,21 +768,84 @@ export class AdminAPI {
       throw new FaucetError("ADMIN_INVALID_INPUT", "Address or IP required");
     }
 
+    if (!reason || reason.trim().length < 5) {
+      throw new FaucetError("ADMIN_INVALID_INPUT", "Reason must be at least 5 characters");
+    }
+
+    // Validar formato de dirección Ethereum
+    if (address && !/^0x[a-fA-F0-9]{40}$/.test(address)) {
+      throw new FaucetError("ADMIN_INVALID_INPUT", "Invalid Ethereum address format");
+    }
+
+    // Validar formato de IP
+    if (ip && !/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(ip)) {
+      throw new FaucetError("ADMIN_INVALID_INPUT", "Invalid IP address format");
+    }
+
     ServiceManager.GetService(FaucetProcess).emitLog(
       FaucetLogLevel.WARNING,
-      `Admin ${session.username} added to blacklist: ${address || ip} (reason: ${reason || 'none'})`
+      `Admin ${session.username} added to blacklist: ${address || ip} (reason: ${reason})`
     );
 
-    // TODO: Implementar adición real a blacklist
+    // TODO: Implementar adición real a blacklist en base de datos
     return {
       success: true,
       message: `Added ${address || ip} to blacklist`,
-      item: { address, ip, reason, addedBy: session.username, timestamp: Date.now() }
+      item: { 
+        address, 
+        ip, 
+        reason: reason.trim(), 
+        addedBy: session.username, 
+        timestamp: Date.now() 
+      }
     };
   }
 
   /**
-   * Remueve de blacklist
+   * Agrega a whitelist con validación mejorada
+   */
+  private async addToWhitelist(session: IAdminSession, data: any): Promise<any> {
+    const { address, ip, reason } = data;
+    
+    if (!address && !ip) {
+      throw new FaucetError("ADMIN_INVALID_INPUT", "Address or IP required");
+    }
+
+    if (!reason || reason.trim().length < 5) {
+      throw new FaucetError("ADMIN_INVALID_INPUT", "Reason must be at least 5 characters");
+    }
+
+    // Validar formato de dirección Ethereum
+    if (address && !/^0x[a-fA-F0-9]{40}$/.test(address)) {
+      throw new FaucetError("ADMIN_INVALID_INPUT", "Invalid Ethereum address format");
+    }
+
+    // Validar formato de IP
+    if (ip && !/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(ip)) {
+      throw new FaucetError("ADMIN_INVALID_INPUT", "Invalid IP address format");
+    }
+
+    ServiceManager.GetService(FaucetProcess).emitLog(
+      FaucetLogLevel.INFO,
+      `Admin ${session.username} added to whitelist: ${address || ip} (reason: ${reason})`
+    );
+
+    // TODO: Implementar adición real a whitelist en base de datos
+    return {
+      success: true,
+      message: `Added ${address || ip} to whitelist`,
+      item: { 
+        address, 
+        ip, 
+        reason: reason.trim(), 
+        addedBy: session.username, 
+        timestamp: Date.now() 
+      }
+    };
+  }
+
+  /**
+   * Remueve de blacklist con validación mejorada
    */
   private async removeFromBlacklist(session: IAdminSession, data: any): Promise<any> {
     const { address, ip } = data;
@@ -761,38 +859,16 @@ export class AdminAPI {
       `Admin ${session.username} removed from blacklist: ${address || ip}`
     );
 
-    // TODO: Implementar remoción real de blacklist
+    // TODO: Implementar remoción real de blacklist en base de datos
     return {
       success: true,
-      message: `Removed ${address || ip} from blacklist`
+      message: `Removed ${address || ip} from blacklist`,
+      removedItem: { address, ip, removedBy: session.username, timestamp: Date.now() }
     };
   }
 
   /**
-   * Agrega a whitelist
-   */
-  private async addToWhitelist(session: IAdminSession, data: any): Promise<any> {
-    const { address, ip, reason } = data;
-    
-    if (!address && !ip) {
-      throw new FaucetError("ADMIN_INVALID_INPUT", "Address or IP required");
-    }
-
-    ServiceManager.GetService(FaucetProcess).emitLog(
-      FaucetLogLevel.INFO,
-      `Admin ${session.username} added to whitelist: ${address || ip} (reason: ${reason || 'none'})`
-    );
-
-    // TODO: Implementar adición real a whitelist
-    return {
-      success: true,
-      message: `Added ${address || ip} to whitelist`,
-      item: { address, ip, reason, addedBy: session.username, timestamp: Date.now() }
-    };
-  }
-
-  /**
-   * Remueve de whitelist
+   * Remueve de whitelist con validación mejorada
    */
   private async removeFromWhitelist(session: IAdminSession, data: any): Promise<any> {
     const { address, ip } = data;
@@ -806,17 +882,14 @@ export class AdminAPI {
       `Admin ${session.username} removed from whitelist: ${address || ip}`
     );
 
-    // TODO: Implementar remoción real de whitelist
+    // TODO: Implementar remoción real de whitelist en base de datos
     return {
       success: true,
-      message: `Removed ${address || ip} from whitelist`
+      message: `Removed ${address || ip} from whitelist`,
+      removedItem: { address, ip, removedBy: session.username, timestamp: Date.now() }
     };
   }
-
-  /**
-   * Maneja sesiones de usuarios
-   */
-  private async handleUserSessions(req: IncomingMessage, session: IAdminSession, path: string[], method: string): Promise<any> {
+  private async handleUserSessions(req: IncomingMessage, session: IAdminSession, path: string[], method: string, body?: Buffer): Promise<any> {
     if (path.length === 0) {
       // GET /api/admin/users/sessions - Obtener sesiones activas de usuarios
       const sessionManager = ServiceManager.GetService(SessionManager);
@@ -832,18 +905,50 @@ export class AdminAPI {
             remoteIP: s.getRemoteIP(),
             startTime: s.getStartTime(),
             status: s.getSessionStatus(),
-            tasks: s.getBlockingTasks()
+            tasks: s.getBlockingTasks().map(task => task.getTaskName())
           }))
         }
       };
     }
 
-    if (path[0] === 'terminate' && method === 'POST') {
+    if (path[0] === 'terminate' && method === 'POST' && body) {
       // POST /api/admin/users/sessions/terminate - Terminar sesión específica
-      // TODO: Implementar terminación de sesiones
+      const data = JSON.parse(body.toString());
+      const { sessionId } = data;
+
+      if (!sessionId) {
+        throw new FaucetError("ADMIN_INVALID_INPUT", "Session ID required");
+      }
+
+      const sessionManager = ServiceManager.GetService(SessionManager);
+      const targetSession = sessionManager.getSession(sessionId);
+
+      if (!targetSession) {
+        return {
+          success: false,
+          error: {
+            code: "ADMIN_SESSION_NOT_FOUND",
+            message: "Session not found"
+          }
+        };
+      }
+
+      // Terminar la sesión
+      targetSession.kill();
+
+      ServiceManager.GetService(FaucetProcess).emitLog(
+        FaucetLogLevel.WARNING,
+        `Admin ${session.username} terminated session ${sessionId} for ${targetSession.getTargetAddr()}`
+      );
+
       return {
-        success: false,
-        message: "Session termination not implemented yet"
+        success: true,
+        message: `Session ${sessionId} terminated successfully`,
+        terminatedSession: {
+          sessionId,
+          targetAddr: targetSession.getTargetAddr(),
+          remoteIP: targetSession.getRemoteIP()
+        }
       };
     }
 

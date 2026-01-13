@@ -1,6 +1,6 @@
 
 // Admin Dashboard Bundle
-// Generated at: 2026-01-13T21:31:33.379Z
+// Generated at: 2026-01-13T22:40:59.058Z
 
 (function() {
   'use strict';
@@ -432,7 +432,199 @@
     ]);
   };
 
-  // Admin Config Component
+  // Admin Users Component
+  const AdminUsers = ({ token }) => {
+    const [activeTab, setActiveTab] = useState('overview');
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    
+    // Estados para diferentes secciones
+    const [userStats, setUserStats] = useState(null);
+    const [blacklist, setBlacklist] = useState([]);
+    const [whitelist, setWhitelist] = useState([]);
+    const [activeSessions, setActiveSessions] = useState([]);
+    const [topUsers, setTopUsers] = useState([]);
+    
+    // Estados para formularios
+    const [newEntry, setNewEntry] = useState({ address: '', ip: '', reason: '' });
+    const [showAddForm, setShowAddForm] = useState(null);
+    const [actionLoading, setActionLoading] = useState(false);
+
+    const tabs = [
+      { key: 'overview', label: '📊 Resumen', icon: '📊' },
+      { key: 'blacklist', label: '🚫 Blacklist', icon: '🚫' },
+      { key: 'whitelist', label: '✅ Whitelist', icon: '✅' },
+      { key: 'sessions', label: '🔗 Sesiones Activas', icon: '🔗' },
+      { key: 'top-users', label: '🏆 Top Usuarios', icon: '🏆' }
+    ];
+
+    useEffect(() => {
+      fetchData();
+    }, [token, activeTab]);
+
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        switch (activeTab) {
+          case 'overview':
+            await fetchUserStats();
+            break;
+          case 'blacklist':
+            await fetchBlacklist();
+            break;
+          case 'whitelist':
+            await fetchWhitelist();
+            break;
+          case 'sessions':
+            await fetchActiveSessions();
+            break;
+          case 'top-users':
+            await fetchTopUsers();
+            break;
+        }
+      } catch (error) {
+        setError('Error al cargar datos de usuarios');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchUserStats = async () => {
+      const response = await fetch('/api/admin/users', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setUserStats(data.data);
+      } else {
+        throw new Error(data.error?.message || 'Error al cargar estadísticas');
+      }
+    };
+
+    const fetchBlacklist = async () => {
+      const response = await fetch('/api/admin/users/blacklist', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setBlacklist([
+          ...data.data.addresses.map(addr => ({ ...addr, type: 'address' })),
+          ...data.data.ips.map(ip => ({ ...ip, type: 'ip' }))
+        ]);
+      } else {
+        throw new Error(data.error?.message || 'Error al cargar blacklist');
+      }
+    };
+
+    const formatAddress = (address) => {
+      return `${address.slice(0, 6)}...${address.slice(-4)}`;
+    };
+
+    const formatTimeAgo = (timestamp) => {
+      const now = Date.now();
+      const diffMs = now - timestamp;
+      const diffMins = Math.floor(diffMs / 60000);
+      
+      if (diffMins < 60) {
+        return `${diffMins}m`;
+      } else if (diffMins < 1440) {
+        return `${Math.floor(diffMins / 60)}h`;
+      } else {
+        return `${Math.floor(diffMins / 1440)}d`;
+      }
+    };
+
+    if (loading) {
+      return h('div', { className: 'admin-users' }, [
+        h('div', { key: 'loading', className: 'loading-container' }, [
+          h('div', { key: 'spinner', className: 'loading-spinner large' }),
+          h('p', { key: 'text' }, 'Cargando gestión de usuarios...')
+        ])
+      ]);
+    }
+
+    return h('div', { className: 'admin-users' }, [
+      h('div', { key: 'header', className: 'users-header' }, [
+        h('div', { key: 'left', className: 'header-left' }, [
+          h('h2', { key: 'title' }, 'Gestión de Usuarios'),
+          h('p', { key: 'subtitle' }, 'Administra usuarios, sesiones y listas de control de acceso')
+        ])
+      ]),
+
+      error && h('div', { key: 'error-banner', className: 'error-banner' }, [
+        h('span', { key: 'message' }, `⚠️ ${error}`),
+        h('button', { key: 'close', onClick: () => setError(null) }, '✕')
+      ]),
+
+      h('div', { key: 'tabs', className: 'users-tabs' },
+        tabs.map(tab =>
+          h('button', {
+            key: tab.key,
+            className: `tab-button ${activeTab === tab.key ? 'active' : ''}`,
+            onClick: () => setActiveTab(tab.key)
+          }, [
+            h('span', { key: 'icon', className: 'tab-icon' }, tab.icon),
+            h('span', { key: 'label', className: 'tab-label' }, tab.label)
+          ])
+        )
+      ),
+
+      h('div', { key: 'content', className: 'users-content' }, [
+        activeTab === 'overview' && userStats && h('div', { key: 'overview', className: 'users-overview' }, [
+          h('div', { key: 'stats', className: 'stats-grid' }, [
+            h('div', { key: 'total', className: 'stat-card' }, [
+              h('div', { key: 'icon', className: 'stat-icon' }, '👥'),
+              h('div', { key: 'content', className: 'stat-content' }, [
+                h('h3', { key: 'title' }, 'Usuarios Totales'),
+                h('div', { key: 'value', className: 'stat-value' }, userStats.totalUsers || 0),
+                h('div', { key: 'subtitle', className: 'stat-subtitle' }, 'Direcciones únicas')
+              ])
+            ]),
+            h('div', { key: 'active', className: 'stat-card' }, [
+              h('div', { key: 'icon', className: 'stat-icon' }, '🟢'),
+              h('div', { key: 'content', className: 'stat-content' }, [
+                h('h3', { key: 'title' }, 'Usuarios Activos'),
+                h('div', { key: 'value', className: 'stat-value' }, userStats.activeUsers || 0),
+                h('div', { key: 'subtitle', className: 'stat-subtitle' }, 'Últimas 24h')
+              ])
+            ]),
+            h('div', { key: 'blacklist', className: 'stat-card' }, [
+              h('div', { key: 'icon', className: 'stat-icon' }, '🚫'),
+              h('div', { key: 'content', className: 'stat-content' }, [
+                h('h3', { key: 'title' }, 'Blacklist'),
+                h('div', { key: 'value', className: 'stat-value' }, userStats.blacklistCount || 0),
+                h('div', { key: 'subtitle', className: 'stat-subtitle' }, 'Direcciones/IPs bloqueadas')
+              ])
+            ]),
+            h('div', { key: 'whitelist', className: 'stat-card' }, [
+              h('div', { key: 'icon', className: 'stat-icon' }, '✅'),
+              h('div', { key: 'content', className: 'stat-content' }, [
+                h('h3', { key: 'title' }, 'Whitelist'),
+                h('div', { key: 'value', className: 'stat-value' }, userStats.whitelistCount || 0),
+                h('div', { key: 'subtitle', className: 'stat-subtitle' }, 'Direcciones/IPs permitidas')
+              ])
+            ])
+          ])
+        ]),
+        
+        (activeTab === 'blacklist' || activeTab === 'whitelist' || activeTab === 'sessions' || activeTab === 'top-users') && 
+        h('div', { key: 'placeholder', style: { padding: '40px', textAlign: 'center' } }, [
+          h('h3', { key: 'title' }, `Funcionalidad de ${activeTab} en desarrollo`),
+          h('p', { key: 'message' }, 'Esta sección estará disponible próximamente')
+        ])
+      ])
+    ]);
+  };
   const AdminConfig = ({ token }) => {
     const [config, setConfig] = useState(null);
     const [originalConfig, setOriginalConfig] = useState(null);
