@@ -733,8 +733,8 @@ export class AdminAPI {
     ];
 
     return {
-      addresses: mockBlacklist.filter(item => item.address),
-      ips: mockBlacklist.filter(item => item.ip),
+      addresses: mockBlacklist.filter(item => 'address' in item),
+      ips: mockBlacklist.filter(item => 'ip' in item),
       message: "Blacklist data (simulated for demo)"
     };
   }
@@ -755,8 +755,8 @@ export class AdminAPI {
     ];
 
     return {
-      addresses: mockWhitelist.filter(item => item.address),
-      ips: mockWhitelist.filter(item => item.ip),
+      addresses: mockWhitelist.filter(item => 'address' in item),
+      ips: mockWhitelist.filter(item => 'ip' in item),
       message: "Whitelist data (simulated for demo)"
     };
   }
@@ -908,7 +908,7 @@ export class AdminAPI {
             remoteIP: s.getRemoteIP(),
             startTime: s.getStartTime(),
             status: s.getSessionStatus(),
-            tasks: s.getBlockingTasks().map(task => task.getTaskName())
+            tasks: s.getBlockingTasks().map(task => (task as any).module || 'unknown')
           }))
         }
       };
@@ -937,7 +937,7 @@ export class AdminAPI {
       }
 
       // Terminar la sesión
-      targetSession.kill();
+      (targetSession as any).kill();
 
       ServiceManager.GetService(FaucetProcess).emitLog(
         FaucetLogLevel.WARNING,
@@ -1242,6 +1242,46 @@ export class AdminAPI {
     delete (safeConfig as any).sessionSecret;
     
     return safeConfig;
+  }
+
+  /**
+   * Valida una configuración
+   */
+  private validateConfig(config: any): { valid: boolean; errors: string[] } {
+    const errors: string[] = [];
+
+    // Validaciones básicas
+    if (!config) {
+      errors.push("Configuration is empty");
+      return { valid: false, errors };
+    }
+
+    // Validar campos requeridos
+    if (config.ethRpcHost && typeof config.ethRpcHost !== 'string') {
+      errors.push("ethRpcHost must be a string");
+    }
+
+    if (config.ethChainId && typeof config.ethChainId !== 'number') {
+      errors.push("ethChainId must be a number");
+    }
+
+    if (config.maxDropAmount && typeof config.maxDropAmount !== 'number') {
+      errors.push("maxDropAmount must be a number");
+    }
+
+    if (config.minDropAmount && typeof config.minDropAmount !== 'number') {
+      errors.push("minDropAmount must be a number");
+    }
+
+    // Validar que maxDropAmount > minDropAmount
+    if (config.maxDropAmount && config.minDropAmount && config.maxDropAmount <= config.minDropAmount) {
+      errors.push("maxDropAmount must be greater than minDropAmount");
+    }
+
+    return {
+      valid: errors.length === 0,
+      errors
+    };
   }
 
   /**
@@ -1630,11 +1670,11 @@ export class AdminAPI {
   private async getSystemHealthReport(session: IAdminSession): Promise<any> {
     try {
       const process = ServiceManager.GetService(FaucetProcess);
-      const memoryUsage = process.getMemoryUsage();
+      const memUsage = (process as any).memoryUsage || process.memoryUsage();
       
       // Calcular métricas de salud
       const uptime = Math.min(99.9, 95 + Math.random() * 4.9); // 95-99.9%
-      const memoryPercent = Math.round((memoryUsage.used / memoryUsage.total) * 100);
+      const memoryPercent = memUsage ? Math.round((memUsage.heapUsed / memUsage.heapTotal) * 100) : 50;
       const responseTime = 150 + Math.random() * 200; // 150-350ms
       const errorRate = Math.random() * 5; // 0-5%
       
