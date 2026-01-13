@@ -98,6 +98,12 @@ export class AdminDashboardModule extends BaseModule<IAdminDashboardConfig> {
     webApi.registerApiEndpoint("admin/export/sessions/csv", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
     webApi.registerApiEndpoint("admin/export/alerts", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
     webApi.registerApiEndpoint("admin/export/users", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    
+    // Reportes
+    webApi.registerApiEndpoint("admin/reports/summary", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    webApi.registerApiEndpoint("admin/reports/charts", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    webApi.registerApiEndpoint("admin/reports/modules", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    webApi.registerApiEndpoint("admin/reports/health", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
   }
 
   private unregisterApiEndpoints(): void {

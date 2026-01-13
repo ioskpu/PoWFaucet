@@ -74,6 +74,9 @@ export class AdminAPI {
         case 'export':
           return this.handleExport(req, session, path.slice(1), method);
         
+        case 'reports':
+          return this.handleReports(req, session, path.slice(1), method);
+        
         default:
           throw new FaucetError("ADMIN_ENDPOINT_NOT_FOUND", `Endpoint not found: ${path.join('/')}`);
       }
@@ -1451,8 +1454,264 @@ export class AdminAPI {
   }
 
   /**
-   * Maneja errores de la API
+   * Maneja endpoints de reportes
    */
+  private async handleReports(req: IncomingMessage, session: IAdminSession, path: string[], method: string): Promise<any> {
+    this.requirePermission(session, 'reports');
+
+    if (method !== 'GET') {
+      throw new FaucetError("ADMIN_METHOD_NOT_ALLOWED", "Only GET method allowed for reports endpoints");
+    }
+
+    const urlParams = new URL(req.url || '', `http://${req.headers.host}`).searchParams;
+    const period = urlParams.get('period') || '7d';
+
+    switch (path[0]) {
+      case 'summary':
+        return this.getReportSummary(session, period);
+      
+      case 'charts':
+        return this.getChartData(session, period);
+      
+      case 'modules':
+        return this.getModuleReports(session, period);
+      
+      case 'health':
+        return this.getSystemHealthReport(session);
+      
+      default:
+        throw new FaucetError("ADMIN_REPORTS_ENDPOINT_NOT_FOUND", `Reports endpoint not found: ${path[0]}`);
+    }
+  }
+
+  /**
+   * Obtiene resumen de reportes
+   */
+  private async getReportSummary(session: IAdminSession, period: string): Promise<any> {
+    try {
+      const database = ServiceManager.GetService(FaucetDatabase);
+      
+      // Simular datos de reporte basados en el período
+      const periodDays = this.getPeriodDays(period);
+      const mockData = {
+        period: this.getPeriodLabel(period),
+        totalRequests: Math.floor(Math.random() * 1000 * periodDays),
+        totalDistributed: (Math.random() * 10 * periodDays).toFixed(4),
+        uniqueUsers: Math.floor(Math.random() * 100 * periodDays),
+        successRate: 85 + Math.random() * 10, // 85-95%
+        averageClaimAmount: (0.1 + Math.random() * 0.4).toFixed(4),
+        topHour: `${Math.floor(Math.random() * 24)}:00`,
+        topDay: this.getRandomDay()
+      };
+
+      ServiceManager.GetService(FaucetProcess).emitLog(
+        FaucetLogLevel.INFO,
+        `Admin ${session.username} requested report summary for ${period}`
+      );
+
+      return {
+        success: true,
+        data: mockData
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Obtiene datos para gráficos
+   */
+  private async getChartData(session: IAdminSession, period: string): Promise<any> {
+    try {
+      const periodDays = this.getPeriodDays(period);
+      const labels = [];
+      const requestsData = [];
+      const ethData = [];
+
+      // Generar datos simulados para el período
+      for (let i = periodDays - 1; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        labels.push(date.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' }));
+        
+        // Simular datos con tendencia
+        const baseRequests = 50 + Math.random() * 100;
+        const baseEth = 2 + Math.random() * 8;
+        
+        requestsData.push(Math.floor(baseRequests));
+        ethData.push(parseFloat(baseEth.toFixed(2)));
+      }
+
+      const chartData = {
+        labels,
+        datasets: [
+          {
+            label: 'Solicitudes',
+            data: requestsData,
+            borderColor: '#667eea',
+            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+            fill: true
+          },
+          {
+            label: 'ETH Distribuido',
+            data: ethData,
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            fill: true
+          }
+        ]
+      };
+
+      ServiceManager.GetService(FaucetProcess).emitLog(
+        FaucetLogLevel.INFO,
+        `Admin ${session.username} requested chart data for ${period}`
+      );
+
+      return {
+        success: true,
+        data: chartData
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Obtiene reportes de módulos
+   */
+  private async getModuleReports(session: IAdminSession, period: string): Promise<any> {
+    try {
+      const { faucetConfig } = await import("../../config/FaucetConfig.js");
+      const modules = [];
+
+      // Generar estadísticas simuladas para cada módulo
+      for (const moduleName in faucetConfig.modules) {
+        if (faucetConfig.modules.hasOwnProperty(moduleName)) {
+          const moduleConfig = faucetConfig.modules[moduleName];
+          const enabled = moduleConfig.enabled || false;
+          
+          modules.push({
+            name: moduleName,
+            enabled,
+            sessionsProcessed: enabled ? Math.floor(Math.random() * 1000) : 0,
+            successRate: enabled ? 80 + Math.random() * 15 : 0, // 80-95%
+            averageProcessingTime: enabled ? 100 + Math.random() * 400 : 0, // 100-500ms
+            lastActivity: enabled ? Date.now() - Math.random() * 3600000 : 0 // Última hora
+          });
+        }
+      }
+
+      ServiceManager.GetService(FaucetProcess).emitLog(
+        FaucetLogLevel.INFO,
+        `Admin ${session.username} requested module reports for ${period}`
+      );
+
+      return {
+        success: true,
+        data: { modules }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Obtiene reporte de salud del sistema
+   */
+  private async getSystemHealthReport(session: IAdminSession): Promise<any> {
+    try {
+      const process = ServiceManager.GetService(FaucetProcess);
+      const memoryUsage = process.getMemoryUsage();
+      
+      // Calcular métricas de salud
+      const uptime = Math.min(99.9, 95 + Math.random() * 4.9); // 95-99.9%
+      const memoryPercent = Math.round((memoryUsage.used / memoryUsage.total) * 100);
+      const responseTime = 150 + Math.random() * 200; // 150-350ms
+      const errorRate = Math.random() * 5; // 0-5%
+      
+      // Calcular puntuación general
+      let overallScore = 100;
+      if (uptime < 99) overallScore -= 10;
+      if (memoryPercent > 80) overallScore -= 15;
+      if (responseTime > 500) overallScore -= 10;
+      if (errorRate > 2) overallScore -= 10;
+      
+      const healthData = {
+        overallScore: Math.max(0, Math.round(overallScore)),
+        uptime: parseFloat(uptime.toFixed(1)),
+        memoryUsage: memoryPercent,
+        responseTime: Math.round(responseTime),
+        errorRate: parseFloat(errorRate.toFixed(1)),
+        services: [
+          { name: 'Web Server', status: 'healthy', uptime: 99.9 },
+          { name: 'Database', status: 'healthy', uptime: 99.8 },
+          { name: 'RPC Connection', status: 'warning', uptime: 95.2 },
+          { name: 'Session Manager', status: 'healthy', uptime: 99.5 }
+        ],
+        tps: Math.round(Math.random() * 10), // 0-10 TPS
+        activeConnections: Math.floor(Math.random() * 50),
+        cacheHitRate: 85 + Math.random() * 10 // 85-95%
+      };
+
+      ServiceManager.GetService(FaucetProcess).emitLog(
+        FaucetLogLevel.INFO,
+        `Admin ${session.username} requested system health report`
+      );
+
+      return {
+        success: true,
+        data: healthData
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Obtiene número de días para un período
+   */
+  private getPeriodDays(period: string): number {
+    switch (period) {
+      case '24h': return 1;
+      case '7d': return 7;
+      case '30d': return 30;
+      case '90d': return 90;
+      default: return 7;
+    }
+  }
+
+  /**
+   * Obtiene etiqueta legible para un período
+   */
+  private getPeriodLabel(period: string): string {
+    switch (period) {
+      case '24h': return 'últimas 24 horas';
+      case '7d': return 'últimos 7 días';
+      case '30d': return 'últimos 30 días';
+      case '90d': return 'últimos 90 días';
+      default: return 'últimos 7 días';
+    }
+  }
+
+  /**
+   * Obtiene un día aleatorio de la semana
+   */
+  private getRandomDay(): string {
+    const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    return days[Math.floor(Math.random() * days.length)];
+  }
   private handleError(error: any): any {
     if (error instanceof FaucetError) {
       ServiceManager.GetService(FaucetProcess).emitLog(

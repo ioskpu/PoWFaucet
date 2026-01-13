@@ -600,6 +600,17 @@ try {
     }
   }
 
+  // Add AdminReports CSS
+  const adminReportsCSS = join(__dirname, 'src/components/admin/AdminReports.css');
+  if (existsSync(adminReportsCSS)) {
+    try {
+      const cssContent = readFileSync(adminReportsCSS, 'utf8');
+      combinedCSS += `\n\n/* From AdminReports.css */\n${cssContent}`;
+    } catch (error) {
+      console.log(`⚠️  Could not read AdminReports.css`);
+    }
+  }
+
   // Write CSS file
   writeFileSync(CSS_OUTPUT_FILE, combinedCSS);
 
@@ -712,6 +723,7 @@ try {
       { key: 'dashboard', label: '📊 Dashboard', icon: '📊' },
       { key: 'config', label: '⚙️ Configuración', icon: '⚙️' },
       { key: 'users', label: '👥 Usuarios', icon: '👥' },
+      { key: 'reports', label: '📈 Reportes', icon: '📈' },
       { key: 'logs', label: '📋 Logs', icon: '📋' },
       { key: 'alerts', label: '🚨 Alertas', icon: '🚨' },
       { key: 'modules', label: '🧩 Módulos', icon: '🧩' }
@@ -1492,10 +1504,437 @@ try {
       ])
     ]);
   };
+
+  // Admin Reports Component
+  const AdminReports = ({ token }) => {
+    const [activeSection, setActiveSection] = useState('overview');
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [period, setPeriod] = useState('7d');
+    
+    // Estados para diferentes secciones
+    const [reportSummary, setReportSummary] = useState(null);
+    const [chartData, setChartData] = useState(null);
+    const [moduleReports, setModuleReports] = useState(null);
+    const [healthReport, setHealthReport] = useState(null);
+
+    const sections = [
+      { key: 'overview', label: '📊 Resumen General', icon: '📊' },
+      { key: 'charts', label: '📈 Gráficos', icon: '📈' },
+      { key: 'modules', label: '🧩 Módulos', icon: '🧩' },
+      { key: 'health', label: '💚 Salud del Sistema', icon: '💚' },
+      { key: 'export', label: '📤 Exportar Datos', icon: '📤' }
+    ];
+
+    const periods = [
+      { value: '24h', label: 'Últimas 24h' },
+      { value: '7d', label: 'Últimos 7 días' },
+      { value: '30d', label: 'Últimos 30 días' },
+      { value: '90d', label: 'Últimos 90 días' }
+    ];
+
+    useEffect(() => {
+      fetchData();
+    }, [token, activeSection, period]);
+
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        switch (activeSection) {
+          case 'overview':
+            await fetchReportSummary();
+            break;
+          case 'charts':
+            await fetchChartData();
+            break;
+          case 'modules':
+            await fetchModuleReports();
+            break;
+          case 'health':
+            await fetchHealthReport();
+            break;
+          case 'export':
+            // No necesita fetch, es solo UI
+            setLoading(false);
+            break;
+        }
+      } catch (error) {
+        setError('Error al cargar datos de reportes');
+        setLoading(false);
+      }
+    };
+
+    const fetchReportSummary = async () => {
+      try {
+        const response = await fetch(\`/api/admin/reports/summary?period=\${period}\`, {
+          headers: {
+            'Authorization': \`Bearer \${token}\`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          setReportSummary(data.data);
+        } else {
+          throw new Error(data.error?.message || 'Error al cargar resumen');
+        }
+      } catch (error) {
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchChartData = async () => {
+      try {
+        const response = await fetch(\`/api/admin/reports/charts?period=\${period}\`, {
+          headers: {
+            'Authorization': \`Bearer \${token}\`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          setChartData(data.data);
+        } else {
+          throw new Error(data.error?.message || 'Error al cargar gráficos');
+        }
+      } catch (error) {
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchModuleReports = async () => {
+      try {
+        const response = await fetch(\`/api/admin/reports/modules?period=\${period}\`, {
+          headers: {
+            'Authorization': \`Bearer \${token}\`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          setModuleReports(data.data);
+        } else {
+          throw new Error(data.error?.message || 'Error al cargar reportes de módulos');
+        }
+      } catch (error) {
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchHealthReport = async () => {
+      try {
+        const response = await fetch('/api/admin/reports/health', {
+          headers: {
+            'Authorization': \`Bearer \${token}\`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          setHealthReport(data.data);
+        } else {
+          throw new Error(data.error?.message || 'Error al cargar reporte de salud');
+        }
+      } catch (error) {
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const exportData = async (type, format = 'json') => {
+      try {
+        const response = await fetch(\`/api/admin/export/\${type}\${format === 'csv' ? '/csv' : ''}\`, {
+          headers: {
+            'Authorization': \`Bearer \${token}\`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          if (format === 'csv') {
+            // Descargar CSV
+            const blob = new Blob([data.data], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = \`faucet-\${type}-\${Date.now()}.csv\`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+          } else {
+            // Descargar JSON
+            const blob = new Blob([JSON.stringify(data.data, null, 2)], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = \`faucet-\${type}-\${Date.now()}.json\`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+          }
+        } else {
+          alert('Error al exportar datos: ' + (data.error?.message || 'Error desconocido'));
+        }
+      } catch (error) {
+        alert('Error al exportar datos: ' + error.message);
+      }
+    };
+
+    const getHealthColor = (score) => {
+      if (score >= 90) return '#10b981'; // Verde
+      if (score >= 70) return '#f59e0b'; // Amarillo
+      return '#ef4444'; // Rojo
+    };
+
+    const getHealthLabel = (score) => {
+      if (score >= 90) return 'Excelente';
+      if (score >= 70) return 'Bueno';
+      if (score >= 50) return 'Regular';
+      return 'Crítico';
+    };
+
+    if (loading) {
+      return h('div', { className: 'admin-reports' }, [
+        h('div', { key: 'loading', className: 'loading-container' }, [
+          h('div', { key: 'spinner', className: 'loading-spinner large' }),
+          h('p', { key: 'text' }, 'Cargando reportes y análisis...')
+        ])
+      ]);
+    }
+
+    return h('div', { className: 'admin-reports' }, [
+      h('div', { key: 'header', className: 'reports-header' }, [
+        h('div', { key: 'left', className: 'header-left' }, [
+          h('h2', { key: 'title' }, 'Reportes y Análisis'),
+          h('p', { key: 'subtitle' }, 'Análisis detallado del rendimiento y uso del faucet')
+        ]),
+        h('div', { key: 'controls', className: 'header-controls' }, [
+          activeSection !== 'health' && activeSection !== 'export' && h('select', {
+            key: 'period',
+            value: period,
+            onChange: (e) => setPeriod(e.target.value),
+            className: 'period-selector'
+          }, periods.map(p => h('option', { key: p.value, value: p.value }, p.label)))
+        ])
+      ]),
+
+      error && h('div', { key: 'error-banner', className: 'error-banner' }, [
+        h('span', { key: 'message' }, \`⚠️ \${error}\`),
+        h('button', { key: 'close', onClick: () => setError(null) }, '✕')
+      ]),
+
+      h('div', { key: 'layout', className: 'reports-layout' }, [
+        h('div', { key: 'sidebar', className: 'reports-sidebar' }, [
+          h('nav', { key: 'nav', className: 'reports-nav' },
+            sections.map(section =>
+              h('button', {
+                key: section.key,
+                className: \`nav-item \${activeSection === section.key ? 'active' : ''}\`,
+                onClick: () => setActiveSection(section.key)
+              }, [
+                h('span', { key: 'icon', className: 'nav-icon' }, section.icon),
+                h('span', { key: 'label', className: 'nav-label' }, section.label)
+              ])
+            )
+          )
+        ]),
+
+        h('div', { key: 'content', className: 'reports-content' }, [
+          // Resumen General
+          activeSection === 'overview' && reportSummary && h('div', { key: 'overview', className: 'reports-section' }, [
+            h('div', { key: 'summary-grid', className: 'summary-grid' }, [
+              h('div', { key: 'requests', className: 'summary-card' }, [
+                h('div', { key: 'icon', className: 'summary-icon' }, '📊'),
+                h('div', { key: 'content', className: 'summary-content' }, [
+                  h('h3', { key: 'title' }, 'Total Solicitudes'),
+                  h('div', { key: 'value', className: 'summary-value' }, reportSummary.totalRequests.toLocaleString()),
+                  h('div', { key: 'period', className: 'summary-period' }, reportSummary.period)
+                ])
+              ]),
+              h('div', { key: 'distributed', className: 'summary-card' }, [
+                h('div', { key: 'icon', className: 'summary-icon' }, '💰'),
+                h('div', { key: 'content', className: 'summary-content' }, [
+                  h('h3', { key: 'title' }, 'ETH Distribuido'),
+                  h('div', { key: 'value', className: 'summary-value' }, \`\${reportSummary.totalDistributed} ETH\`),
+                  h('div', { key: 'period', className: 'summary-period' }, reportSummary.period)
+                ])
+              ]),
+              h('div', { key: 'users', className: 'summary-card' }, [
+                h('div', { key: 'icon', className: 'summary-icon' }, '👥'),
+                h('div', { key: 'content', className: 'summary-content' }, [
+                  h('h3', { key: 'title' }, 'Usuarios Únicos'),
+                  h('div', { key: 'value', className: 'summary-value' }, reportSummary.uniqueUsers.toLocaleString()),
+                  h('div', { key: 'period', className: 'summary-period' }, reportSummary.period)
+                ])
+              ]),
+              h('div', { key: 'success', className: 'summary-card' }, [
+                h('div', { key: 'icon', className: 'summary-icon' }, '✅'),
+                h('div', { key: 'content', className: 'summary-content' }, [
+                  h('h3', { key: 'title' }, 'Tasa de Éxito'),
+                  h('div', { key: 'value', className: 'summary-value' }, \`\${reportSummary.successRate.toFixed(1)}%\`),
+                  h('div', { key: 'period', className: 'summary-period' }, reportSummary.period)
+                ])
+              ])
+            ]),
+            h('div', { key: 'details', className: 'summary-details' }, [
+              h('div', { key: 'detail-item', className: 'detail-item' }, [
+                h('span', { key: 'label' }, 'Cantidad promedio por claim:'),
+                h('span', { key: 'value' }, \`\${reportSummary.averageClaimAmount} ETH\`)
+              ]),
+              h('div', { key: 'detail-item2', className: 'detail-item' }, [
+                h('span', { key: 'label' }, 'Hora pico de actividad:'),
+                h('span', { key: 'value' }, reportSummary.topHour)
+              ]),
+              h('div', { key: 'detail-item3', className: 'detail-item' }, [
+                h('span', { key: 'label' }, 'Día más activo:'),
+                h('span', { key: 'value' }, reportSummary.topDay)
+              ])
+            ])
+          ]),
+
+          // Gráficos
+          activeSection === 'charts' && h('div', { key: 'charts', className: 'reports-section' }, [
+            h('div', { key: 'chart-placeholder', className: 'chart-placeholder' }, [
+              h('div', { key: 'icon', className: 'placeholder-icon' }, '📈'),
+              h('h3', { key: 'title' }, 'Gráficos Interactivos'),
+              h('p', { key: 'message' }, 'Los gráficos interactivos estarán disponibles próximamente'),
+              chartData && h('div', { key: 'data-info', className: 'data-info' }, [
+                h('p', { key: 'info' }, \`Datos disponibles para \${chartData.labels.length} períodos\`),
+                h('p', { key: 'datasets' }, \`\${chartData.datasets.length} series de datos cargadas\`)
+              ])
+            ])
+          ]),
+
+          // Módulos
+          activeSection === 'modules' && moduleReports && h('div', { key: 'modules', className: 'reports-section' }, [
+            h('div', { key: 'modules-grid', className: 'modules-grid' },
+              moduleReports.modules.map(module =>
+                h('div', { key: module.name, className: 'module-card' }, [
+                  h('div', { key: 'header', className: 'module-header' }, [
+                    h('h4', { key: 'name' }, module.name),
+                    h('div', { key: 'status', className: \`module-status \${module.enabled ? 'enabled' : 'disabled'}\` }, 
+                      module.enabled ? 'Activo' : 'Inactivo')
+                  ]),
+                  module.enabled && h('div', { key: 'stats', className: 'module-stats' }, [
+                    h('div', { key: 'processed', className: 'stat-item' }, [
+                      h('span', { key: 'label' }, 'Sesiones procesadas:'),
+                      h('span', { key: 'value' }, module.sessionsProcessed.toLocaleString())
+                    ]),
+                    h('div', { key: 'success', className: 'stat-item' }, [
+                      h('span', { key: 'label' }, 'Tasa de éxito:'),
+                      h('span', { key: 'value' }, \`\${module.successRate.toFixed(1)}%\`)
+                    ]),
+                    h('div', { key: 'time', className: 'stat-item' }, [
+                      h('span', { key: 'label' }, 'Tiempo promedio:'),
+                      h('span', { key: 'value' }, \`\${module.averageProcessingTime.toFixed(0)}ms\`)
+                    ])
+                  ])
+                ])
+              )
+            )
+          ]),
+
+          // Salud del Sistema
+          activeSection === 'health' && healthReport && h('div', { key: 'health', className: 'reports-section' }, [
+            h('div', { key: 'health-overview', className: 'health-overview' }, [
+              h('div', { key: 'score-card', className: 'health-score-card' }, [
+                h('div', { key: 'score-circle', className: 'health-score-circle', style: { borderColor: getHealthColor(healthReport.overallScore) } }, [
+                  h('div', { key: 'score', className: 'health-score' }, healthReport.overallScore),
+                  h('div', { key: 'label', className: 'health-label' }, getHealthLabel(healthReport.overallScore))
+                ])
+              ]),
+              h('div', { key: 'metrics', className: 'health-metrics' }, [
+                h('div', { key: 'metric1', className: 'health-metric' }, [
+                  h('span', { key: 'label' }, 'Uptime:'),
+                  h('span', { key: 'value' }, \`\${healthReport.uptime}%\`)
+                ]),
+                h('div', { key: 'metric2', className: 'health-metric' }, [
+                  h('span', { key: 'label' }, 'Uso de memoria:'),
+                  h('span', { key: 'value' }, \`\${healthReport.memoryUsage}%\`)
+                ]),
+                h('div', { key: 'metric3', className: 'health-metric' }, [
+                  h('span', { key: 'label' }, 'Tiempo de respuesta:'),
+                  h('span', { key: 'value' }, \`\${healthReport.responseTime}ms\`)
+                ]),
+                h('div', { key: 'metric4', className: 'health-metric' }, [
+                  h('span', { key: 'label' }, 'Tasa de error:'),
+                  h('span', { key: 'value' }, \`\${healthReport.errorRate.toFixed(1)}%\`)
+                ])
+              ])
+            ]),
+            h('div', { key: 'services', className: 'services-status' }, [
+              h('h4', { key: 'title' }, 'Estado de Servicios'),
+              h('div', { key: 'services-grid', className: 'services-grid' },
+                healthReport.services.map(service =>
+                  h('div', { key: service.name, className: 'service-card' }, [
+                    h('div', { key: 'name', className: 'service-name' }, service.name),
+                    h('div', { key: 'status', className: \`service-status \${service.status}\` }, service.status),
+                    h('div', { key: 'uptime', className: 'service-uptime' }, \`\${service.uptime}% uptime\`)
+                  ])
+                )
+              )
+            ])
+          ]),
+
+          // Exportar Datos
+          activeSection === 'export' && h('div', { key: 'export', className: 'reports-section' }, [
+            h('div', { key: 'export-grid', className: 'export-grid' }, [
+              h('div', { key: 'stats', className: 'export-card' }, [
+                h('h4', { key: 'title' }, '📊 Estadísticas'),
+                h('p', { key: 'desc' }, 'Exportar datos de estadísticas y métricas del faucet'),
+                h('div', { key: 'buttons', className: 'export-buttons' }, [
+                  h('button', { key: 'json', onClick: () => exportData('stats', 'json') }, 'JSON'),
+                  h('button', { key: 'csv', onClick: () => exportData('stats', 'csv') }, 'CSV')
+                ])
+              ]),
+              h('div', { key: 'sessions', className: 'export-card' }, [
+                h('h4', { key: 'title' }, '🔗 Sesiones'),
+                h('p', { key: 'desc' }, 'Exportar datos de sesiones de usuarios'),
+                h('div', { key: 'buttons', className: 'export-buttons' }, [
+                  h('button', { key: 'json', onClick: () => exportData('sessions', 'json') }, 'JSON'),
+                  h('button', { key: 'csv', onClick: () => exportData('sessions', 'csv') }, 'CSV')
+                ])
+              ]),
+              h('div', { key: 'alerts', className: 'export-card' }, [
+                h('h4', { key: 'title' }, '🚨 Alertas'),
+                h('p', { key: 'desc' }, 'Exportar historial de alertas del sistema'),
+                h('div', { key: 'buttons', className: 'export-buttons' }, [
+                  h('button', { key: 'json', onClick: () => exportData('alerts', 'json') }, 'JSON')
+                ])
+              ]),
+              h('div', { key: 'users', className: 'export-card' }, [
+                h('h4', { key: 'title' }, '👥 Usuarios'),
+                h('p', { key: 'desc' }, 'Exportar datos de usuarios y direcciones'),
+                h('div', { key: 'buttons', className: 'export-buttons' }, [
+                  h('button', { key: 'json', onClick: () => exportData('users', 'json') }, 'JSON')
+                ])
+              ])
+            ])
+          ])
+        ])
+      ])
+    ]);
+  };
+
+  // Admin App Component
+  const AdminApp = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [token, setToken] = useState(null);
     const [user, setUser] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [currentView, setCurrentView] = useState('dashboard');
 
     useEffect(() => {
       const savedToken = localStorage.getItem('adminToken');
@@ -1534,13 +1973,40 @@ try {
       setToken(null);
       setUser(null);
       setIsAuthenticated(false);
+      setCurrentView('dashboard');
 
       localStorage.removeItem('adminToken');
       localStorage.removeItem('adminUser');
     };
 
+    const handleNavigate = (view) => {
+      setCurrentView(view);
+    };
+
     const handleError = (error) => {
       console.error('Admin error:', error);
+    };
+
+    const renderCurrentView = () => {
+      switch (currentView) {
+        case 'dashboard':
+          return h(AdminDashboard, { key: 'dashboard', token });
+        case 'config':
+          return h(AdminConfig, { key: 'config', token });
+        case 'users':
+          return h(AdminUsers, { key: 'users', token });
+        case 'reports':
+          return h(AdminReports, { key: 'reports', token });
+        case 'logs':
+        case 'alerts':
+        case 'modules':
+          return h('div', { key: 'placeholder', style: { padding: '40px', textAlign: 'center' } }, [
+            h('h3', { key: 'title' }, \`Funcionalidad de \${currentView} en desarrollo\`),
+            h('p', { key: 'message' }, 'Esta sección estará disponible próximamente')
+          ]);
+        default:
+          return h(AdminDashboard, { key: 'dashboard', token });
+      }
     };
 
     if (isLoading) {
@@ -1559,8 +2025,15 @@ try {
     }
 
     return h('div', { className: 'admin-app' }, [
-      h(AdminLayout, { key: 'layout', user, token, onLogout: handleLogout }, [
-        h(AdminDashboard, { key: 'dashboard', token })
+      h(AdminLayout, { 
+        key: 'layout', 
+        user, 
+        token, 
+        onLogout: handleLogout, 
+        currentView, 
+        onNavigate: handleNavigate 
+      }, [
+        renderCurrentView()
       ])
     ]);
   };
