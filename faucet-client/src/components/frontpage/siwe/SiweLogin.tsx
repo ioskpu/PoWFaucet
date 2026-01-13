@@ -134,6 +134,9 @@ export class SiweLogin extends React.PureComponent<ISiweLoginProps, ISiweLoginSt
 
       const address = accounts[0];
       const signer = await provider.getSigner();
+      
+      // Obtener dirección con checksum (EIP-55)
+      const checksumAddress = (await import('ethers')).getAddress(address);
 
       // Obtener nonce del servidor
       const nonceResponse = await fetch(
@@ -157,7 +160,7 @@ export class SiweLogin extends React.PureComponent<ISiweLoginProps, ISiweLoginSt
 
       const message = this.createSiweMessage({
         domain,
-        address,
+        address: checksumAddress,
         statement: 'Sign in to PoWFaucet to verify wallet ownership.',
         uri,
         version: '1',

@@ -26,6 +26,7 @@ export interface IFaucetConfig {
     github?: IGithubModuleConfig;
     pow?: IPoWModuleConfig;
     passport?: IPassportModuleConfig;
+    siwe?: ISiweModuleConfig;
     voucher?: IVoucherModuleConfig;
     zupass?: IZupassModuleConfig;
   };
@@ -116,6 +117,14 @@ export interface IPassportModuleConfig {
 export interface IVoucherModuleConfig {
   voucherLabel: string;
   infoHtml: string;
+}
+
+export interface ISiweModuleConfig {
+  domain: string;
+  uri: string;
+  required: boolean;
+  rewardFactor: number;
+  sessionExpiration?: number;
 }
 
 export interface IFaucetStatus {
