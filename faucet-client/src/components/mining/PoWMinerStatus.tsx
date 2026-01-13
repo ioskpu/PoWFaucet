@@ -177,7 +177,7 @@ export class PoWMinerStatus extends React.PureComponent<IPoWMinerStatusProps, IP
               </OverlayTrigger>
             </div>
 
-            <img src={(this.props.pageContext.faucetUrls.imagesUrl || "/images") + (this.state.disableProgressGif ? "/progress.png" : "/progress.gif")} />
+            <img src={(this.props.pageContext.faucetUrls.imagesUrl || "/images") + "/mining-progress.svg"} className="mining-animation" />
           </div>
         </div>
 

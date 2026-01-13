@@ -21,10 +21,10 @@ serverPort: 8080
 httpProxyCount: 0
 
 # title of the faucet
-faucetTitle: "Holesky PoW Faucet"
+faucetTitle: "PoW Faucet"
 
 # url to image displayed on the startpage
-faucetImage: "/images/fauceth_420.jpg"
+faucetImage: "/images/eth-faucet.svg"
 
 # some additional html to show on the startpage
 faucetHomeHtml: |
@@ -348,8 +348,7 @@ modules:
     enabled: true
 
     # reward amount per eligible hash (in wei)
-    #powShareReward: 12500000000000000  # 0.0125
-    powShareReward:   2000000000000000  # 0.002 ETH
+    powShareReward: 5000000000000000  # 0.005 ETH per share
 
     # penalty for not responding to a verification request (percent of powShareReward)
     # shouldn't be too high as this can happen regularly in case of connection loss or so
@@ -371,7 +370,7 @@ modules:
     powHashrateHardLimit: 1100 # hard limit (reject shares with too high nonces)
 
     # number of 0-bits the scrypt hash needs to start with to be eligible for a reward
-    powDifficulty: 11
+    powDifficulty: 9  # lower = easier = faster rewards for testing
 
     # mining algorithm to use
     powHashAlgo: "argon2"  # scrypt / cryptonight / argon2 / nickminer

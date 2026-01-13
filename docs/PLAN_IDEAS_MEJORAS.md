@@ -16,7 +16,7 @@ PoWFaucet es un faucet modularizado para cadenas EVM que combina múltiples mét
 
 | # | Idea | Estado | Plan |
 |---|------|--------|------|
-| 1 | Módulo de Autenticación Web3 (SIWE) | 🔄 En Progreso | [Ver Plan](./ideas/01-siwe-auth/PLAN.md) |
+| 1 | Módulo de Autenticación Web3 (SIWE) | ✅ Completado | [Ver Plan](./ideas/01-siwe-auth/PLAN.md) |
 | 2 | Dashboard de Administración | ⏳ Pendiente | - |
 | 3 | Soporte Multi-Cadena Simultáneo | ⏳ Pendiente | - |
 | 4 | Módulo de Gamificación | ⏳ Pendiente | - |
