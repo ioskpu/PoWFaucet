@@ -143,7 +143,7 @@ modules:
   ## Sign-In with Ethereum (SIWE) Authentication
   siwe:
     # enable / disable SIWE authentication
-    enabled: false
+    enabled: true
 
     # domain for SIWE message (should match your faucet domain)
     #domain: "faucet.example.com"
