@@ -14,6 +14,10 @@ export default {
   resolve: {
     extensions: ['.ts', '.js'],
   },
+  externals: {
+    'bcrypt': 'commonjs bcrypt',
+    'jsonwebtoken': 'commonjs jsonwebtoken',
+  },
   output: {
     filename: 'powfaucet.cjs',
     path: path.resolve(basedir, 'bundle'),
