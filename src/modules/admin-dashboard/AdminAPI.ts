@@ -1669,12 +1669,12 @@ export class AdminAPI {
    */
   private async getSystemHealthReport(session: IAdminSession): Promise<any> {
     try {
-      const process = ServiceManager.GetService(FaucetProcess);
-      const memUsage = (process as any).memoryUsage || process.memoryUsage();
+      // Usar process.memoryUsage() de Node.js directamente
+      const memUsage = process.memoryUsage();
       
       // Calcular métricas de salud
       const uptime = Math.min(99.9, 95 + Math.random() * 4.9); // 95-99.9%
-      const memoryPercent = memUsage ? Math.round((memUsage.heapUsed / memUsage.heapTotal) * 100) : 50;
+      const memoryPercent = Math.round((memUsage.heapUsed / memUsage.heapTotal) * 100);
       const responseTime = 150 + Math.random() * 200; // 150-350ms
       const errorRate = Math.random() * 5; // 0-5%
       
