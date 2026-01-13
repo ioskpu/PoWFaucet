@@ -141,8 +141,8 @@ export class SiweModule extends BaseModule<ISiweConfig> {
       };
 
     } catch (ex) {
-      ServiceManager.GetService(FaucetProcess).emitLog(FaucetLogLevel.WARNING, "SIWE verify error: " + ex.toString());
-      return { success: false, error: "Verification failed" };
+      ServiceManager.GetService(FaucetProcess).emitLog(FaucetLogLevel.WARNING, "SIWE verify error: " + ex.toString() + " | Stack: " + (ex as Error).stack);
+      return { success: false, error: "Verification failed: " + ex.toString() };
     }
   }
 

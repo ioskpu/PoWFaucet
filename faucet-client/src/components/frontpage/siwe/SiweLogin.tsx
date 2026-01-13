@@ -150,6 +150,10 @@ export class SiweLogin extends React.PureComponent<ISiweLoginProps, ISiweLoginSt
       const domain = siweConfig?.domain || window.location.host;
       const uri = siweConfig?.uri || window.location.origin;
       const issuedAt = new Date().toISOString();
+      
+      // Obtener chainId de la red conectada
+      const network = await provider.getNetwork();
+      const chainId = Number(network.chainId);
 
       const message = this.createSiweMessage({
         domain,
@@ -157,7 +161,7 @@ export class SiweLogin extends React.PureComponent<ISiweLoginProps, ISiweLoginSt
         statement: 'Sign in to PoWFaucet to verify wallet ownership.',
         uri,
         version: '1',
-        chainId: 1,
+        chainId: chainId,
         nonce: nonceData.nonce,
         issuedAt,
       });
