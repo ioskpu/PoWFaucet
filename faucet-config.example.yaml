@@ -98,8 +98,8 @@ ethTxExplorerLink: "https://holesky.etherscan.io/tx/{txid}"
 
 
 # min/max drop amount (max is the default if no module lowers it)
-maxDropAmount: 1000000000000000000 # 1 ETH
-minDropAmount: 10000000000000000 # 0.01 ETH
+maxDropAmount: 50000000000000000 # 0.05 ETH
+minDropAmount: 1000000000000000 # 0.001 ETH
 
 # maximum session time (from start till payout)
 # only relevant if one of the enabled protection mechanisms introduces a session delay (eg. mining)
@@ -506,13 +506,13 @@ modules:
 ### Fund Management
 
 # minimum balance to keep in the faucet wallet (in wei)
-spareFundsAmount: 100000000000000000  # 0.1 ETH
+spareFundsAmount: 1000000000000000  # 0.001 ETH
 
 # minimum balance to show the empty faucet error message
-noFundsBalance:   1000000000000000000  # 1 ETH
+noFundsBalance:   10000000000000000  # 0.01 ETH
 
 # minimum balance to show the low funds warning
-lowFundsBalance: 10000000000000000000  # 10 ETH
+lowFundsBalance: 50000000000000000  # 0.05 ETH
 
 # low faucet balance warning message / false to disable the warning
 lowFundsWarning: "The faucet is running out of funds! Faucet Balance: {1}"
