@@ -1,0 +1,83 @@
+# Configuración de prueba para Admin Dashboard
+# IMPORTANTE: Este archivo es solo para testing - NO usar en producción
+
+modules:
+  admin-dashboard:
+    enabled: true
+    
+    adminUsers:
+      - username: "admin"
+        passwordHash: "$2b$10$.9zHn6JyxjOzQo56zCCBmub5.N7JkXrERm.qAb9sIxkrIb2CK1R3."  # admin123
+        permissions: ["all"]
+        email: "admin@test.com"
+      - username: "monitor"
+        passwordHash: "$2b$10$.9zHn6JyxjOzQo56zCCBmub5.N7JkXrERm.qAb9sIxkrIb2CK1R3."  # admin123
+        permissions: ["read", "stats", "alerts"]
+        email: "monitor@test.com"
+    
+    sessionSecret: "test-secret-key-change-in-production"
+    sessionExpiration: 3600
+    
+    alerts:
+      lowBalance:
+        enabled: true
+        threshold: 1000000000000000000  # 1 ETH
+        notification: ["dashboard"]
+      
+      highActivity:
+        enabled: true
+        threshold: 50  # requests per hour
+        notification: ["dashboard"]
+      
+      systemErrors:
+        enabled: true
+        notification: ["dashboard"]
+      
+      failedTransactions:
+        enabled: true
+        threshold: 5
+        notification: ["dashboard"]
+    
+    ui:
+      refreshInterval: 5000
+      theme: "dark"
+      language: "es"
+      itemsPerPage: 20
+    
+    reports:
+      retention: 30
+      autoExport: false
+      exportFormat: ["json"]
+    
+    security:
+      maxLoginAttempts: 3
+      lockoutDuration: 300  # 5 minutes
+      requireHTTPS: false   # Para testing local
+      csrfProtection: true
+      sessionSecure: false  # Para testing local
+      adminPath: "/admin"
+
+# Configuración mínima para que funcione el faucet
+version: 2
+database:
+  driver: "sqlite"
+  file: "test-faucet.db"
+serverPort: 8080
+faucetTitle: "Admin Dashboard Test"
+faucetSecret: "test-secret"
+ethWalletKey: "0x1234567890123456789012345678901234567890123456789012345678901234"
+ethRpcHost: "https://rpc.sepolia.org"
+ethChainId: 11155111
+faucetCoinSymbol: "ETH"
+faucetCoinType: "native"
+minClaim: 100000000000000000    # 0.1 ETH
+maxClaim: 1000000000000000000   # 1 ETH
+sessionTimeout: 3600
+claimTimeout: 600
+
+# Módulos mínimos para testing
+modules:
+  pow:
+    enabled: false
+  captcha:
+    enabled: false

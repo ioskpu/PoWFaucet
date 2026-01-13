@@ -427,4 +427,113 @@ export class FaucetDatabase {
     return BigInt(row.TotalAmount)
   }
 
+  /**
+   * Obtiene estadísticas de sesiones para un período de tiempo
+   */
+  public async getSessionStats(startTime?: number, endTime?: number): Promise<{
+    total: number;
+    completed: number;
+    failed: number;
+    totalDistributed: string;
+  }> {
+    let whereClause = "";
+    let params: any[] = [];
+
+    if (startTime !== undefined) {
+      whereClause += " WHERE StartTime >= ?";
+      params.push(startTime);
+    }
+
+    if (endTime !== undefined) {
+      whereClause += startTime !== undefined ? " AND StartTime < ?" : " WHERE StartTime < ?";
+      params.push(endTime);
+    }
+
+    const query = `
+      SELECT 
+        COUNT(*) as total,
+        SUM(CASE WHEN Status = 'finished' THEN 1 ELSE 0 END) as completed,
+        SUM(CASE WHEN Status = 'failed' THEN 1 ELSE 0 END) as failed,
+        COALESCE(SUM(CASE WHEN Status = 'finished' THEN CAST(DropAmount AS FLOAT) ELSE 0 END), 0) as totalDistributed
+      FROM Sessions${whereClause}
+    `;
+
+    const row = await this.db.get(query, params) as {
+      total: number;
+      completed: number;
+      failed: number;
+      totalDistributed: number;
+    };
+
+    return {
+      total: row?.total || 0,
+      completed: row?.completed || 0,
+      failed: row?.failed || 0,
+      totalDistributed: (row?.totalDistributed || 0).toString()
+    };
+  }
+
+  /**
+   * Obtiene las direcciones más activas
+   */
+  public async getTopAddresses(limit: number = 10): Promise<{
+    targetAddr: string;
+    sessionCount: number;
+    totalReceived: string;
+    lastSession: number;
+  }[]> {
+    const query = `
+      SELECT 
+        TargetAddr as targetAddr,
+        COUNT(*) as sessionCount,
+        COALESCE(SUM(CASE WHEN Status = 'finished' THEN CAST(DropAmount AS FLOAT) ELSE 0 END), 0) as totalReceived,
+        MAX(StartTime) as lastSession
+      FROM Sessions 
+      GROUP BY TargetAddr 
+      ORDER BY sessionCount DESC 
+      LIMIT ?
+    `;
+
+    const rows = await this.db.all(query, [limit]) as {
+      targetAddr: string;
+      sessionCount: number;
+      totalReceived: number;
+      lastSession: number;
+    }[];
+
+    return rows.map(row => ({
+      ...row,
+      totalReceived: row.totalReceived.toString()
+    }));
+  }
+
+  /**
+   * Obtiene las IPs más activas
+   */
+  public async getTopIPs(limit: number = 10): Promise<{
+    remoteIP: string;
+    sessionCount: number;
+    lastSession: number;
+    country?: string;
+  }[]> {
+    const query = `
+      SELECT 
+        RemoteIP as remoteIP,
+        COUNT(*) as sessionCount,
+        MAX(StartTime) as lastSession
+      FROM Sessions 
+      GROUP BY RemoteIP 
+      ORDER BY sessionCount DESC 
+      LIMIT ?
+    `;
+
+    const rows = await this.db.all(query, [limit]) as {
+      remoteIP: string;
+      sessionCount: number;
+      lastSession: number;
+    }[];
+
+    return rows;
+  }
+
 }

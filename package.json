@@ -1,6 +1,6 @@
 {
   "name": "@powfaucet/server",
-  "version": "2.4.2",
+  "version": "2.5",
   "description": "PoW Faucet Server",
   "main": "dist/app.js",
   "bin": "bundle/powfaucet.cjs",
@@ -35,9 +35,11 @@
     "outputPath": "bin"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/better-sqlite3": "^7.6.11",
     "@types/chai": "^5.0.0",
     "@types/json-bigint": "^1.0.4",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/mocha": "^10.0.7",
     "@types/mysql": "^2.15.26",
     "@types/node-fetch": "^2.6.11",
@@ -64,11 +66,13 @@
     "@ethereumjs/common": "^10.0.0",
     "@ethereumjs/tx": "^10.0.0",
     "@types/node": "^24.0.7",
+    "bcrypt": "^5.1.1",
     "bignumber.js": "^9.1.2",
     "commander": "^14.0.0",
     "hcaptcha": "^0.2.0",
     "html-entities": "^2.5.2",
     "json-bigint": "^1.0.0",
+    "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.11.0",
     "node-fetch": "^3.3.2",
     "randombytes": "^2.1.0",

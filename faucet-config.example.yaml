@@ -169,6 +169,75 @@ modules:
         limitAmount: 5000000000000000000  # 5 ETH
         duration: 86400  # 1 day
 
+  ## Admin Dashboard
+  admin-dashboard:
+    # enable / disable admin dashboard
+    enabled: false
+
+    # admin users configuration
+    adminUsers:
+      - username: "admin"
+        # password hash (use bcrypt to generate: node -e "console.log(require('bcrypt').hashSync('your-password', 10))")
+        passwordHash: "$2b$10$example.hash.replace.with.real.hash"
+        permissions: ["all"]
+        email: "admin@example.com"
+      - username: "monitor"
+        passwordHash: "$2b$10$example.hash.replace.with.real.hash"
+        permissions: ["read", "stats", "alerts"]
+        email: "monitor@example.com"
+
+    # session configuration
+    sessionSecret: "change-this-secret-key-to-something-random"
+    sessionExpiration: 3600  # 1 hour
+
+    # alert configuration
+    alerts:
+      lowBalance:
+        enabled: true
+        threshold: 1000000000000000000  # 1 ETH
+        notification: ["dashboard", "email"]
+        message: "Faucet balance is running low"
+      
+      highActivity:
+        enabled: true
+        threshold: 100  # requests per hour
+        notification: ["dashboard"]
+        message: "Unusually high activity detected"
+      
+      systemErrors:
+        enabled: true
+        notification: ["dashboard", "email"]
+        message: "System errors detected"
+      
+      failedTransactions:
+        enabled: true
+        threshold: 10  # failed transactions per hour
+        notification: ["dashboard"]
+        message: "High number of failed transactions"
+
+    # UI configuration
+    ui:
+      refreshInterval: 5000  # 5 seconds
+      theme: "dark"  # dark, light, auto
+      language: "es"  # es, en
+      itemsPerPage: 20
+
+    # reports configuration
+    reports:
+      retention: 90  # days
+      autoExport: false
+      exportFormat: ["csv", "json"]
+      # emailReports: ["admin@example.com"]
+
+    # security configuration
+    security:
+      maxLoginAttempts: 5
+      lockoutDuration: 900  # 15 minutes
+      requireHTTPS: true
+      csrfProtection: true
+      sessionSecure: true
+      adminPath: "/admin"  # custom admin path
+
   ## ENS Name
   ensname:
     enabled: true
