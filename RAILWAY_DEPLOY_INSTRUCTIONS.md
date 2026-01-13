@@ -24,8 +24,8 @@ ADMIN_SESSION_SECRET=a7f3c9e2b8d4f1a6c5e9b2d7f4a8c3e6b9d2f5a1c8e4b7d3f6a9c2e5b8d
 
 ### 2. Credenciales de Acceso al Admin Dashboard
 
-**Usuario:** `admin`  
-**Contraseña:** `Sara@1256`  
+**Usuario:** `admin_user`  
+**Contraseña:** `password_seguro`  
 **Hash (ya configurado):** `$2b$10$ubxntsYHB9P5unEc8rIbN.ix/jft2Lr9ALpnm3EK/SmVr5LCv5zyO`
 
 ### 3. URL de Acceso

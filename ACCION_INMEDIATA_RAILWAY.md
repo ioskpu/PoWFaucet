@@ -56,8 +56,8 @@ En Railway → Deployments → View Logs, busca:
 **URL:** `https://tu-dominio.up.railway.app/admin`
 
 **Credenciales:**
-- Usuario: `admin`
-- Contraseña: `Sara@1256`
+- Usuario: `admin_user`
+- Contraseña: `password`
 
 ---
 
