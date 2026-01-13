@@ -1,7 +1,7 @@
 import React from 'react';
 import { IFaucetConfig } from '../../../common/FaucetConfig';
 import { IFaucetContext } from '../../../common/FaucetContext';
-import { BrowserProvider } from 'ethers';
+import { BrowserProvider, getAddress } from 'ethers';
 
 import './SiweLogin.css';
 
@@ -136,7 +136,7 @@ export class SiweLogin extends React.PureComponent<ISiweLoginProps, ISiweLoginSt
       const signer = await provider.getSigner();
       
       // Obtener dirección con checksum (EIP-55)
-      const checksumAddress = (await import('ethers')).getAddress(address);
+      const checksumAddress = getAddress(address);
 
       // Obtener nonce del servidor
       const nonceResponse = await fetch(
