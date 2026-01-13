@@ -31,6 +31,8 @@ PoWFaucet es un faucet modularizado para cadenas EVM que combina múltiples mét
 | 13 | Internacionalización (i18n) | ⏳ Pendiente | - |
 | 14 | Modo Instant Claim | ⏳ Pendiente | - |
 | 15 | Sistema de Notificaciones | ⏳ Pendiente | - |
+| 16 | Documentación Completa de Módulos | ⏳ Pendiente | - |
+| 17 | Mejoras UX - Auto-completar Dirección SIWE | ⏳ Pendiente | - |
 
 **Leyenda:** ✅ Completado | 🔄 En Progreso | ⏳ Pendiente
 
@@ -256,6 +258,61 @@ PoWFaucet es un faucet modularizado para cadenas EVM que combina múltiples mét
 
 **Complejidad:** Media  
 **Prioridad:** Baja
+
+---
+
+### 📚 16. Documentación Completa de Módulos
+
+**Descripción:** Crear documentación detallada para cada módulo del sistema y guía de uso completa.
+
+**Características propuestas:**
+- Documentación individual por módulo (configuración, uso, ejemplos)
+- Índice de documentación en README principal
+- Guías de configuración paso a paso
+- Ejemplos de casos de uso comunes
+- Troubleshooting por módulo
+- API documentation para desarrolladores
+
+**Estructura sugerida:**
+```
+docs/
+├── modules/
+│   ├── siwe.md
+│   ├── pow.md
+│   ├── captcha.md
+│   └── ...
+├── guides/
+│   ├── installation.md
+│   ├── configuration.md
+│   └── troubleshooting.md
+└── api/
+    └── endpoints.md
+```
+
+**Complejidad:** Media  
+**Prioridad:** Alta (para mantenimiento y adopción)
+
+---
+
+### 🔄 17. Mejoras UX - Auto-completar Dirección SIWE
+
+**Descripción:** Mejorar la experiencia de usuario del módulo SIWE auto-completando la dirección ETH después de la autenticación.
+
+**Funcionalidades:**
+- Auto-completar campo de dirección ETH con la wallet autenticada
+- Permitir al usuario cambiar la dirección si desea enviar a otra wallet
+- Indicador visual de que la dirección fue auto-completada
+- Validación para aplicar bonus solo si coincide con wallet autenticada
+- Mensaje explicativo del flujo para el usuario
+
+**Beneficios:**
+- Mejor UX - menos pasos manuales
+- Reduce errores de escritura de direcciones
+- Flujo más intuitivo y profesional
+- Mantiene flexibilidad para casos de uso avanzados
+
+**Complejidad:** Baja  
+**Prioridad:** Media
 
 ---
 

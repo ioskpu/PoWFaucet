@@ -94,6 +94,16 @@ faucet-client/src/components/frontpage/FaucetInput.tsx (modificado)
 
 ---
 
+### Fase 6: Mejoras UX (Pendiente)
+**Estado:** ✅ Completado
+
+- [x] Auto-completar dirección ETH después de autenticación SIWE
+- [x] Permitir al usuario cambiar la dirección si lo desea
+- [x] Mostrar indicador visual de dirección auto-completada
+- [x] Validar que la dirección coincida para aplicar bonus
+
+---
+
 ## Configuración Propuesta
 
 ```yaml
@@ -148,6 +158,7 @@ modules:
 | 12-Ene-2026 | 2 | Implementar lógica SIWE | ✅ |
 | 12-Ene-2026 | 3 | Integrar hooks | ✅ |
 | 12-Ene-2026 | 4 | Crear UI cliente | ✅ |
+| 12-Ene-2026 | 6 | Mejoras UX - Auto-completar | ✅ |
 | - | 5 | Testing y docs | ⏳ |
 
 ---
@@ -178,6 +189,6 @@ modules:
 
 ## Próximo Paso
 
-Continuar con **Fase 5**: Testing y documentación.
+Continuar con **Fase 5**: Testing y documentación, seguido de **Fase 6**: Mejoras UX (auto-completar dirección).
 
-¿Procedemos con los tests o prefieres probar primero el módulo manualmente?
+¿Procedemos con los tests o prefieres implementar primero la mejora UX?

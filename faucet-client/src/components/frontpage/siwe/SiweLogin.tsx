@@ -9,6 +9,7 @@ export interface ISiweLoginProps {
   faucetContext: IFaucetContext;
   faucetConfig: IFaucetConfig;
   targetAddr: string;
+  onAddressAutofill?: (address: string) => void;
 }
 
 export interface ISiweLoginState {
@@ -200,6 +201,11 @@ export class SiweLogin extends React.PureComponent<ISiweLoginProps, ISiweLoginSt
         authInfo,
         connecting: false,
       });
+
+      // Auto-fill address if callback is provided
+      if (this.props.onAddressAutofill) {
+        this.props.onAddressAutofill(authInfo.address);
+      }
 
     } catch (ex: any) {
       console.error('SIWE login error:', ex);

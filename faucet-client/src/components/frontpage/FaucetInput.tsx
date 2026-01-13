@@ -17,6 +17,7 @@ export interface IFaucetInputProps {
 export interface IFaucetInputState {
   submitting: boolean;
   targetAddr: string;
+  siweAutoFilled: boolean;
 }
 
 export class FaucetInput extends React.PureComponent<IFaucetInputProps, IFaucetInputState> {
@@ -32,6 +33,7 @@ export class FaucetInput extends React.PureComponent<IFaucetInputProps, IFaucetI
     this.state = {
       submitting: false,
       targetAddr: this.props.defaultAddr || "",
+      siweAutoFilled: false,
 		};
   }
 
@@ -61,12 +63,28 @@ export class FaucetInput extends React.PureComponent<IFaucetInputProps, IFaucetI
 
     return (
       <div className="faucet-inputs">
-        <input 
-          className="form-control" 
-          value={this.state.targetAddr} 
-          placeholder={"Please enter " + (inputTypes.join(" or "))} 
-          onChange={(evt) => this.setState({ targetAddr: evt.target.value })} 
-        />
+        <div className="address-input-container">
+          <input 
+            className={`form-control ${this.state.siweAutoFilled ? 'siwe-autofilled' : ''}`}
+            value={this.state.targetAddr} 
+            placeholder={"Please enter " + (inputTypes.join(" or "))} 
+            onChange={(evt) => this.onAddressChange(evt.target.value)} 
+          />
+          {this.state.siweAutoFilled && (
+            <div className="siwe-autofill-indicator">
+              <span className="indicator-icon">🔗</span>
+              <span className="indicator-text">Auto-filled from verified wallet</span>
+              <button 
+                type="button" 
+                className="btn-clear-autofill"
+                onClick={() => this.clearAutoFill()}
+                title="Clear auto-filled address"
+              >
+                ×
+              </button>
+            </div>
+          )}
+        </div>
         {needGithubAuth ? 
           <GithubLogin 
             faucetConfig={this.props.faucetConfig} 
@@ -79,6 +97,7 @@ export class FaucetInput extends React.PureComponent<IFaucetInputProps, IFaucetI
             faucetConfig={this.props.faucetConfig}
             faucetContext={this.props.faucetContext}
             targetAddr={this.state.targetAddr}
+            onAddressAutofill={(address: string) => this.onSiweAddressAutofill(address)}
             ref={this.siweLogin}
           />
         : null}
@@ -123,6 +142,27 @@ export class FaucetInput extends React.PureComponent<IFaucetInputProps, IFaucetI
       </div>
     );
 	}
+
+  private onAddressChange(value: string) {
+    this.setState({ 
+      targetAddr: value,
+      siweAutoFilled: false // Clear autofill indicator when user types
+    });
+  }
+
+  private onSiweAddressAutofill(address: string) {
+    this.setState({
+      targetAddr: address,
+      siweAutoFilled: true
+    });
+  }
+
+  private clearAutoFill() {
+    this.setState({
+      targetAddr: "",
+      siweAutoFilled: false
+    });
+  }
 
   private async onSubmitBtnClick() {
     this.setState({

@@ -75,3 +75,56 @@
   color: #198754;
   font-weight: bold;
 }
+
+/* Address input autofill styles */
+.address-input-container {
+  position: relative;
+}
+
+.address-input-container .form-control.siwe-autofilled {
+  border-color: #00b894;
+  background-color: #f0fff4;
+}
+
+.siwe-autofill-indicator {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8em;
+  margin-top: 4px;
+  position: relative;
+}
+
+.siwe-autofill-indicator .indicator-icon {
+  margin-right: 6px;
+  font-size: 1.1em;
+}
+
+.siwe-autofill-indicator .indicator-text {
+  flex: 1;
+}
+
+.siwe-autofill-indicator .btn-clear-autofill {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2em;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.siwe-autofill-indicator .btn-clear-autofill:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
