@@ -1,6 +1,25 @@
 # Configuración de prueba para Admin Dashboard
 # IMPORTANTE: Este archivo es solo para testing - NO usar en producción
 
+# Configuración mínima para que funcione el faucet
+version: 2
+database:
+  driver: "sqlite"
+  file: "test-faucet.db"
+serverPort: 8081
+faucetTitle: "Admin Dashboard Test"
+faucetSecret: "test-secret"
+ethWalletKey: "0x1234567890123456789012345678901234567890123456789012345678901234"
+ethRpcHost: "http://localhost:8545"  # Local test RPC (won't connect but won't hang)
+ethChainId: 1337
+faucetCoinSymbol: "ETH"
+faucetCoinType: "native"
+minClaim: 100000000000000000    # 0.1 ETH
+maxClaim: 1000000000000000000   # 1 ETH
+sessionTimeout: 3600
+claimTimeout: 600
+
+# Módulos
 modules:
   admin-dashboard:
     enabled: true
@@ -57,26 +76,7 @@ modules:
       sessionSecure: false  # Para testing local
       adminPath: "/admin"
 
-# Configuración mínima para que funcione el faucet
-version: 2
-database:
-  driver: "sqlite"
-  file: "test-faucet.db"
-serverPort: 8080
-faucetTitle: "Admin Dashboard Test"
-faucetSecret: "test-secret"
-ethWalletKey: "0x1234567890123456789012345678901234567890123456789012345678901234"
-ethRpcHost: "https://rpc.sepolia.org"
-ethChainId: 11155111
-faucetCoinSymbol: "ETH"
-faucetCoinType: "native"
-minClaim: 100000000000000000    # 0.1 ETH
-maxClaim: 1000000000000000000   # 1 ETH
-sessionTimeout: 3600
-claimTimeout: 600
-
-# Módulos mínimos para testing
-modules:
+  # Otros módulos deshabilitados para testing
   pow:
     enabled: false
   captcha:

@@ -1,0 +1,1437 @@
+
+// Admin Dashboard Bundle
+// Generated at: 2026-01-13T23:10:47.918Z
+
+(function() {
+  'use strict';
+  
+  const { useState, useEffect, createElement: h } = React;
+  const { createRoot } = ReactDOM;
+  
+  // Admin Login Component
+  const AdminLogin = ({ onLogin, onError }) => {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      if (!username || !password) {
+        setError('Por favor ingresa usuario y contraseña');
+        return;
+      }
+
+      setLoading(true);
+      setError('');
+
+      try {
+        const response = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ username, password }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          onLogin(data.token, data.user);
+        } else {
+          setError(data.error?.message || 'Error de autenticación');
+        }
+      } catch (error) {
+        setError('Error de conexión con el servidor');
+        onError && onError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    return h('div', { className: 'admin-login' }, [
+      h('div', { key: 'container', className: 'login-container' }, [
+        h('div', { key: 'header', className: 'login-header' }, [
+          h('h2', { key: 'title' }, '🔐 Admin Dashboard'),
+          h('p', { key: 'subtitle' }, 'Panel de Administración del Faucet')
+        ]),
+        h('form', { key: 'form', className: 'login-form', onSubmit: handleSubmit }, [
+          h('div', { key: 'username-group', className: 'form-group' }, [
+            h('label', { key: 'username-label', htmlFor: 'username' }, 'Usuario'),
+            h('input', {
+              key: 'username-input',
+              id: 'username',
+              type: 'text',
+              value: username,
+              onChange: (e) => setUsername(e.target.value),
+              placeholder: 'Ingresa tu usuario',
+              disabled: loading
+            })
+          ]),
+          h('div', { key: 'password-group', className: 'form-group' }, [
+            h('label', { key: 'password-label', htmlFor: 'password' }, 'Contraseña'),
+            h('input', {
+              key: 'password-input',
+              id: 'password',
+              type: 'password',
+              value: password,
+              onChange: (e) => setPassword(e.target.value),
+              placeholder: 'Ingresa tu contraseña',
+              disabled: loading
+            })
+          ]),
+          error && h('div', { key: 'error', className: 'error-message' }, error),
+          h('button', {
+            key: 'submit',
+            type: 'submit',
+            className: 'login-button',
+            disabled: loading
+          }, loading ? 'Iniciando sesión...' : 'Iniciar Sesión')
+        ])
+      ])
+    ]);
+  };
+
+  // Admin Layout Component
+  const AdminLayout = ({ user, token, onLogout, children, currentView, onNavigate }) => {
+    const formatLoginTime = (timestamp) => {
+      return new Date(timestamp).toLocaleString('es-ES');
+    };
+
+    const getUserInitials = (username) => {
+      return username.substring(0, 2).toUpperCase();
+    };
+
+    const navItems = [
+      { key: 'dashboard', label: '📊 Dashboard', icon: '📊' },
+      { key: 'config', label: '⚙️ Configuración', icon: '⚙️' },
+      { key: 'users', label: '👥 Usuarios', icon: '👥' },
+      { key: 'reports', label: '📈 Reportes', icon: '📈' },
+      { key: 'logs', label: '📋 Logs', icon: '📋' },
+      { key: 'alerts', label: '🚨 Alertas', icon: '🚨' },
+      { key: 'modules', label: '🧩 Módulos', icon: '🧩' }
+    ];
+
+    return h('div', { className: 'admin-layout' }, [
+      h('div', { key: 'sidebar', className: 'admin-sidebar' }, [
+        h('div', { key: 'header', className: 'sidebar-header' }, [
+          h('h1', { key: 'title' }, '🔐 Admin Panel'),
+          h('p', { key: 'subtitle' }, 'PoWFaucet Dashboard')
+        ]),
+        h('nav', { key: 'nav', className: 'sidebar-nav' }, 
+          navItems.map(item => 
+            h('a', { 
+              key: item.key, 
+              href: '#', 
+              className: `nav-item ${currentView === item.key ? 'active' : ''}`,
+              onClick: (e) => {
+                e.preventDefault();
+                onNavigate(item.key);
+              }
+            }, item.label)
+          )
+        ),
+        h('div', { key: 'footer', className: 'sidebar-footer' }, [
+          h('div', { key: 'user-info', className: 'user-info' }, [
+            h('div', { key: 'avatar', className: 'user-avatar' }, getUserInitials(user.username)),
+            h('div', { key: 'details', className: 'user-details' }, [
+              h('h4', { key: 'username' }, user.username),
+              h('p', { key: 'login-time' }, formatLoginTime(user.loginTime))
+            ])
+          ]),
+          h('button', {
+            key: 'logout',
+            className: 'logout-button',
+            onClick: onLogout
+          }, '🚪 Cerrar Sesión')
+        ])
+      ]),
+      h('div', { key: 'main', className: 'admin-main' }, [
+        h('div', { key: 'content', className: 'main-content' }, children)
+      ])
+    ]);
+  };
+
+  // Admin Dashboard Component
+  const AdminDashboard = ({ token }) => {
+    const [stats, setStats] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [lastUpdate, setLastUpdate] = useState(null);
+    const [autoRefresh, setAutoRefresh] = useState(true);
+
+    const fetchStats = async (showLoading = true) => {
+      if (showLoading) setLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch('/api/admin/stats', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          setStats(data.data);
+          setLastUpdate(new Date());
+        } else {
+          setError(data.error?.message || 'Error al cargar estadísticas');
+        }
+      } catch (error) {
+        setError('Error de conexión con el servidor');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const refreshStats = async () => {
+      try {
+        const response = await fetch('/api/admin/stats/refresh', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          setStats(data.data);
+          setLastUpdate(new Date());
+        }
+      } catch (error) {
+        console.error('Error refreshing stats:', error);
+      }
+    };
+
+    useEffect(() => {
+      fetchStats();
+    }, [token]);
+
+    useEffect(() => {
+      if (!autoRefresh) return;
+
+      const interval = setInterval(() => {
+        fetchStats(false);
+      }, 30000);
+
+      return () => clearInterval(interval);
+    }, [autoRefresh, token]);
+
+    const formatUptime = (seconds) => {
+      const days = Math.floor(seconds / 86400);
+      const hours = Math.floor((seconds % 86400) / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+
+      if (days > 0) {
+        return `${days}d ${hours}h ${minutes}m`;
+      } else if (hours > 0) {
+        return `${hours}h ${minutes}m`;
+      } else {
+        return `${minutes}m`;
+      }
+    };
+
+    const formatAddress = (address) => {
+      return `${address.slice(0, 6)}...${address.slice(-4)}`;
+    };
+
+    const formatTimeAgo = (timestamp) => {
+      const now = Date.now();
+      const diffMs = now - timestamp;
+      const diffMins = Math.floor(diffMs / 60000);
+      
+      if (diffMins < 60) {
+        return `${diffMins}m`;
+      } else if (diffMins < 1440) {
+        return `${Math.floor(diffMins / 60)}h`;
+      } else {
+        return `${Math.floor(diffMins / 1440)}d`;
+      }
+    };
+
+    if (loading && !stats) {
+      return h('div', { className: 'admin-dashboard' }, [
+        h('div', { key: 'loading', className: 'loading-container' }, [
+          h('div', { key: 'spinner', className: 'loading-spinner large' }),
+          h('p', { key: 'text' }, 'Cargando estadísticas del dashboard...')
+        ])
+      ]);
+    }
+
+    if (error && !stats) {
+      return h('div', { className: 'admin-dashboard' }, [
+        h('div', { key: 'error', className: 'error-container' }, [
+          h('div', { key: 'icon', className: 'error-icon' }, '⚠️'),
+          h('h3', { key: 'title' }, 'Error al cargar el dashboard'),
+          h('p', { key: 'message' }, error),
+          h('button', {
+            key: 'retry',
+            onClick: () => fetchStats(),
+            className: 'retry-button'
+          }, 'Reintentar')
+        ])
+      ]);
+    }
+
+    return h('div', { className: 'admin-dashboard' }, [
+      // Header Controls
+      h('div', { key: 'header', className: 'dashboard-header' }, [
+        h('div', { key: 'left', className: 'header-left' }, [
+          h('h2', { key: 'title' }, 'Dashboard Principal'),
+          lastUpdate && h('p', { key: 'update', className: 'last-update' }, 
+            `Última actualización: ${lastUpdate.toLocaleTimeString('es-ES')}`)
+        ]),
+        h('div', { key: 'controls', className: 'header-controls' }, [
+          h('label', { key: 'toggle', className: 'auto-refresh-toggle' }, [
+            h('input', {
+              key: 'checkbox',
+              type: 'checkbox',
+              checked: autoRefresh,
+              onChange: (e) => setAutoRefresh(e.target.checked)
+            }),
+            h('span', { key: 'label' }, 'Auto-actualizar')
+          ]),
+          h('button', {
+            key: 'refresh',
+            onClick: refreshStats,
+            className: 'refresh-button'
+          }, '🔄 Actualizar')
+        ])
+      ]),
+
+      // Main Stats Grid
+      h('div', { key: 'stats', className: 'stats-grid' }, [
+        // Balance Card
+        h('div', { key: 'balance', className: 'stat-card balance-card' }, [
+          h('div', { key: 'header', className: 'card-header' }, [
+            h('h3', { key: 'title' }, '💰 Balance del Faucet'),
+            h('div', { key: 'status', className: 'card-status online' })
+          ]),
+          h('div', { key: 'content', className: 'card-content' }, [
+            h('div', { key: 'main', className: 'main-value' }, 
+              `${stats?.balance?.formatted || '0.0000'} ETH`),
+            h('div', { key: 'sub', className: 'sub-value' }, 
+              stats?.balance?.current ? `${stats.balance.current} wei` : 'N/A')
+          ])
+        ]),
+
+        // Activity Card
+        h('div', { key: 'activity', className: 'stat-card activity-card' }, [
+          h('div', { key: 'header', className: 'card-header' }, [
+            h('h3', { key: 'title' }, '📊 Actividad')
+          ]),
+          h('div', { key: 'content', className: 'card-content' }, [
+            h('div', { key: 'stats', className: 'activity-stats' }, [
+              h('div', { key: 'active', className: 'activity-item' }, [
+                h('span', { key: 'label', className: 'activity-label' }, 'Sesiones Activas'),
+                h('span', { key: 'value', className: 'activity-value' }, 
+                  stats?.activity?.activeSessions || 0)
+              ]),
+              h('div', { key: 'completed', className: 'activity-item' }, [
+                h('span', { key: 'label', className: 'activity-label' }, 'Completadas Hoy'),
+                h('span', { key: 'value', className: 'activity-value success' }, 
+                  stats?.activity?.completedToday || 0)
+              ]),
+              h('div', { key: 'failed', className: 'activity-item' }, [
+                h('span', { key: 'label', className: 'activity-label' }, 'Fallidas Hoy'),
+                h('span', { key: 'value', className: 'activity-value error' }, 
+                  stats?.activity?.failedToday || 0)
+              ])
+            ])
+          ])
+        ]),
+
+        // System Card
+        h('div', { key: 'system', className: 'stat-card system-card' }, [
+          h('div', { key: 'header', className: 'card-header' }, [
+            h('h3', { key: 'title' }, '🖥️ Sistema')
+          ]),
+          h('div', { key: 'content', className: 'card-content' }, [
+            h('div', { key: 'stats', className: 'system-stats' }, [
+              h('div', { key: 'uptime', className: 'system-item' }, [
+                h('span', { key: 'label', className: 'system-label' }, 'Uptime'),
+                h('span', { key: 'value', className: 'system-value' }, 
+                  formatUptime(stats?.system?.uptime || 0))
+              ]),
+              h('div', { key: 'memory', className: 'system-item' }, [
+                h('span', { key: 'label', className: 'system-label' }, 'Memoria'),
+                h('span', { key: 'value', className: 'system-value' }, 
+                  `${stats?.system?.memoryUsage?.percentage || 0}%`)
+              ]),
+              h('div', { key: 'node', className: 'system-item' }, [
+                h('span', { key: 'label', className: 'system-label' }, 'Node.js'),
+                h('span', { key: 'value', className: 'system-value' }, 
+                  stats?.system?.nodeVersion || 'N/A')
+              ])
+            ])
+          ])
+        ]),
+
+        // Distribution Card
+        h('div', { key: 'distribution', className: 'stat-card distribution-card' }, [
+          h('div', { key: 'header', className: 'card-header' }, [
+            h('h3', { key: 'title' }, '💸 Distribuido Hoy')
+          ]),
+          h('div', { key: 'content', className: 'card-content' }, [
+            h('div', { key: 'main', className: 'main-value' }, 
+              `${stats?.activity?.totalDistributedFormatted || '0.0000'} ETH`),
+            h('div', { key: 'sub', className: 'sub-value' }, 
+              'Total distribuido en el día actual')
+          ])
+        ])
+      ]),
+
+      // Secondary Stats
+      h('div', { key: 'secondary', className: 'secondary-stats' }, [
+        // Top Addresses
+        h('div', { key: 'addresses', className: 'stat-card top-addresses-card' }, [
+          h('div', { key: 'header', className: 'card-header' }, [
+            h('h3', { key: 'title' }, '🏆 Top Direcciones')
+          ]),
+          h('div', { key: 'content', className: 'card-content' }, [
+            stats?.topAddresses && stats.topAddresses.length > 0 ? 
+              h('div', { key: 'list', className: 'top-list' }, 
+                stats.topAddresses.slice(0, 5).map((addr, index) => 
+                  h('div', { key: addr.address, className: 'top-item' }, [
+                    h('div', { key: 'rank', className: 'rank' }, `#${index + 1}`),
+                    h('div', { key: 'address', className: 'address' }, formatAddress(addr.address)),
+                    h('div', { key: 'requests', className: 'requests' }, `${addr.requests} req`),
+                    h('div', { key: 'time', className: 'last-seen' }, formatTimeAgo(addr.lastRequest))
+                  ])
+                )
+              ) :
+              h('div', { key: 'no-data', className: 'no-data' }, 'No hay datos disponibles')
+          ])
+        ]),
+
+        // Top IPs
+        h('div', { key: 'ips', className: 'stat-card top-ips-card' }, [
+          h('div', { key: 'header', className: 'card-header' }, [
+            h('h3', { key: 'title' }, '🌐 Top IPs')
+          ]),
+          h('div', { key: 'content', className: 'card-content' }, [
+            stats?.topIPs && stats.topIPs.length > 0 ? 
+              h('div', { key: 'list', className: 'top-list' }, 
+                stats.topIPs.slice(0, 5).map((ip, index) => 
+                  h('div', { key: ip.ip, className: 'top-item' }, [
+                    h('div', { key: 'rank', className: 'rank' }, `#${index + 1}`),
+                    h('div', { key: 'ip', className: 'ip' }, ip.ip),
+                    h('div', { key: 'requests', className: 'requests' }, `${ip.requests} req`),
+                    h('div', { key: 'time', className: 'last-seen' }, formatTimeAgo(ip.lastRequest))
+                  ])
+                )
+              ) :
+              h('div', { key: 'no-data', className: 'no-data' }, 'No hay datos disponibles')
+          ])
+        ])
+      ])
+    ]);
+  };
+
+  // Admin Users Component
+  const AdminUsers = ({ token }) => {
+    const [activeTab, setActiveTab] = useState('overview');
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    
+    // Estados para diferentes secciones
+    const [userStats, setUserStats] = useState(null);
+    const [blacklist, setBlacklist] = useState([]);
+    const [whitelist, setWhitelist] = useState([]);
+    const [activeSessions, setActiveSessions] = useState([]);
+    const [topUsers, setTopUsers] = useState([]);
+    
+    // Estados para formularios
+    const [newEntry, setNewEntry] = useState({ address: '', ip: '', reason: '' });
+    const [showAddForm, setShowAddForm] = useState(null);
+    const [actionLoading, setActionLoading] = useState(false);
+
+    const tabs = [
+      { key: 'overview', label: '📊 Resumen', icon: '📊' },
+      { key: 'blacklist', label: '🚫 Blacklist', icon: '🚫' },
+      { key: 'whitelist', label: '✅ Whitelist', icon: '✅' },
+      { key: 'sessions', label: '🔗 Sesiones Activas', icon: '🔗' },
+      { key: 'top-users', label: '🏆 Top Usuarios', icon: '🏆' }
+    ];
+
+    useEffect(() => {
+      fetchData();
+    }, [token, activeTab]);
+
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        switch (activeTab) {
+          case 'overview':
+            await fetchUserStats();
+            break;
+          case 'blacklist':
+            await fetchBlacklist();
+            break;
+          case 'whitelist':
+            await fetchWhitelist();
+            break;
+          case 'sessions':
+            await fetchActiveSessions();
+            break;
+          case 'top-users':
+            await fetchTopUsers();
+            break;
+        }
+      } catch (error) {
+        setError('Error al cargar datos de usuarios');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchUserStats = async () => {
+      const response = await fetch('/api/admin/users', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setUserStats(data.data);
+      } else {
+        throw new Error(data.error?.message || 'Error al cargar estadísticas');
+      }
+    };
+
+    const fetchBlacklist = async () => {
+      const response = await fetch('/api/admin/users/blacklist', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setBlacklist([
+          ...data.data.addresses.map(addr => ({ ...addr, type: 'address' })),
+          ...data.data.ips.map(ip => ({ ...ip, type: 'ip' }))
+        ]);
+      } else {
+        throw new Error(data.error?.message || 'Error al cargar blacklist');
+      }
+    };
+
+    const formatAddress = (address) => {
+      return `${address.slice(0, 6)}...${address.slice(-4)}`;
+    };
+
+    const formatTimeAgo = (timestamp) => {
+      const now = Date.now();
+      const diffMs = now - timestamp;
+      const diffMins = Math.floor(diffMs / 60000);
+      
+      if (diffMins < 60) {
+        return `${diffMins}m`;
+      } else if (diffMins < 1440) {
+        return `${Math.floor(diffMins / 60)}h`;
+      } else {
+        return `${Math.floor(diffMins / 1440)}d`;
+      }
+    };
+
+    if (loading) {
+      return h('div', { className: 'admin-users' }, [
+        h('div', { key: 'loading', className: 'loading-container' }, [
+          h('div', { key: 'spinner', className: 'loading-spinner large' }),
+          h('p', { key: 'text' }, 'Cargando gestión de usuarios...')
+        ])
+      ]);
+    }
+
+    return h('div', { className: 'admin-users' }, [
+      h('div', { key: 'header', className: 'users-header' }, [
+        h('div', { key: 'left', className: 'header-left' }, [
+          h('h2', { key: 'title' }, 'Gestión de Usuarios'),
+          h('p', { key: 'subtitle' }, 'Administra usuarios, sesiones y listas de control de acceso')
+        ])
+      ]),
+
+      error && h('div', { key: 'error-banner', className: 'error-banner' }, [
+        h('span', { key: 'message' }, `⚠️ ${error}`),
+        h('button', { key: 'close', onClick: () => setError(null) }, '✕')
+      ]),
+
+      h('div', { key: 'tabs', className: 'users-tabs' },
+        tabs.map(tab =>
+          h('button', {
+            key: tab.key,
+            className: `tab-button ${activeTab === tab.key ? 'active' : ''}`,
+            onClick: () => setActiveTab(tab.key)
+          }, [
+            h('span', { key: 'icon', className: 'tab-icon' }, tab.icon),
+            h('span', { key: 'label', className: 'tab-label' }, tab.label)
+          ])
+        )
+      ),
+
+      h('div', { key: 'content', className: 'users-content' }, [
+        activeTab === 'overview' && userStats && h('div', { key: 'overview', className: 'users-overview' }, [
+          h('div', { key: 'stats', className: 'stats-grid' }, [
+            h('div', { key: 'total', className: 'stat-card' }, [
+              h('div', { key: 'icon', className: 'stat-icon' }, '👥'),
+              h('div', { key: 'content', className: 'stat-content' }, [
+                h('h3', { key: 'title' }, 'Usuarios Totales'),
+                h('div', { key: 'value', className: 'stat-value' }, userStats.totalUsers || 0),
+                h('div', { key: 'subtitle', className: 'stat-subtitle' }, 'Direcciones únicas')
+              ])
+            ]),
+            h('div', { key: 'active', className: 'stat-card' }, [
+              h('div', { key: 'icon', className: 'stat-icon' }, '🟢'),
+              h('div', { key: 'content', className: 'stat-content' }, [
+                h('h3', { key: 'title' }, 'Usuarios Activos'),
+                h('div', { key: 'value', className: 'stat-value' }, userStats.activeUsers || 0),
+                h('div', { key: 'subtitle', className: 'stat-subtitle' }, 'Últimas 24h')
+              ])
+            ]),
+            h('div', { key: 'blacklist', className: 'stat-card' }, [
+              h('div', { key: 'icon', className: 'stat-icon' }, '🚫'),
+              h('div', { key: 'content', className: 'stat-content' }, [
+                h('h3', { key: 'title' }, 'Blacklist'),
+                h('div', { key: 'value', className: 'stat-value' }, userStats.blacklistCount || 0),
+                h('div', { key: 'subtitle', className: 'stat-subtitle' }, 'Direcciones/IPs bloqueadas')
+              ])
+            ]),
+            h('div', { key: 'whitelist', className: 'stat-card' }, [
+              h('div', { key: 'icon', className: 'stat-icon' }, '✅'),
+              h('div', { key: 'content', className: 'stat-content' }, [
+                h('h3', { key: 'title' }, 'Whitelist'),
+                h('div', { key: 'value', className: 'stat-value' }, userStats.whitelistCount || 0),
+                h('div', { key: 'subtitle', className: 'stat-subtitle' }, 'Direcciones/IPs permitidas')
+              ])
+            ])
+          ])
+        ]),
+        
+        (activeTab === 'blacklist' || activeTab === 'whitelist' || activeTab === 'sessions' || activeTab === 'top-users') && 
+        h('div', { key: 'placeholder', style: { padding: '40px', textAlign: 'center' } }, [
+          h('h3', { key: 'title' }, `Funcionalidad de ${activeTab} en desarrollo`),
+          h('p', { key: 'message' }, 'Esta sección estará disponible próximamente')
+        ])
+      ])
+    ]);
+  };
+  const AdminConfig = ({ token }) => {
+    const [config, setConfig] = useState(null);
+    const [originalConfig, setOriginalConfig] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [error, setError] = useState(null);
+    const [activeSection, setActiveSection] = useState('basic');
+    const [hasChanges, setHasChanges] = useState(false);
+    const [validationErrors, setValidationErrors] = useState([]);
+    const [showPreview, setShowPreview] = useState(false);
+
+    const configSections = [
+      {
+        key: 'basic',
+        label: 'Configuración Básica',
+        description: 'Configuración general del faucet'
+      },
+      {
+        key: 'modules',
+        label: 'Módulos',
+        description: 'Gestión de módulos y sus configuraciones'
+      },
+      {
+        key: 'advanced',
+        label: 'Configuración Avanzada',
+        description: 'Configuraciones técnicas y de seguridad'
+      }
+    ];
+
+    useEffect(() => {
+      fetchConfig();
+    }, [token]);
+
+    useEffect(() => {
+      if (config && originalConfig) {
+        const hasChanges = JSON.stringify(config) !== JSON.stringify(originalConfig);
+        setHasChanges(hasChanges);
+        
+        if (hasChanges) {
+          validateConfig();
+        } else {
+          setValidationErrors([]);
+        }
+      }
+    }, [config, originalConfig]);
+
+    const fetchConfig = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch('/api/admin/config', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          setConfig(data.data);
+          setOriginalConfig(JSON.parse(JSON.stringify(data.data)));
+        } else {
+          setError(data.error?.message || 'Error al cargar configuración');
+        }
+      } catch (error) {
+        setError('Error de conexión con el servidor');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const validateConfig = async () => {
+      if (!config) return;
+
+      try {
+        const response = await fetch('/api/admin/config/validate', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(config),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          setValidationErrors(data.errors || []);
+        } else {
+          setValidationErrors([data.error?.message || 'Error de validación']);
+        }
+      } catch (error) {
+        setValidationErrors(['Error al validar configuración']);
+      }
+    };
+
+    const saveConfig = async () => {
+      if (validationErrors.length > 0) {
+        setError('No se puede guardar: hay errores de validación');
+        return;
+      }
+
+      setSaving(true);
+      setError(null);
+
+      try {
+        const response = await fetch('/api/admin/config', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(config),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          setOriginalConfig(JSON.parse(JSON.stringify(config)));
+          setHasChanges(false);
+          setShowPreview(false);
+          alert('Configuración guardada exitosamente');
+        } else {
+          setError(data.error?.message || 'Error al guardar configuración');
+        }
+      } catch (error) {
+        setError('Error de conexión con el servidor');
+      } finally {
+        setSaving(false);
+      }
+    };
+
+    const resetConfig = () => {
+      if (originalConfig) {
+        setConfig(JSON.parse(JSON.stringify(originalConfig)));
+        setHasChanges(false);
+        setValidationErrors([]);
+        setShowPreview(false);
+      }
+    };
+
+    const updateConfigValue = (path, value) => {
+      if (!config) return;
+
+      const newConfig = JSON.parse(JSON.stringify(config));
+      let current = newConfig;
+
+      for (let i = 0; i < path.length - 1; i++) {
+        if (!current[path[i]]) {
+          current[path[i]] = {};
+        }
+        current = current[path[i]];
+      }
+
+      current[path[path.length - 1]] = value;
+      setConfig(newConfig);
+    };
+
+    const toggleModule = (moduleName, enabled) => {
+      updateConfigValue(['modules', moduleName, 'enabled'], enabled);
+    };
+
+    if (loading) {
+      return h('div', { className: 'admin-config' }, [
+        h('div', { key: 'loading', className: 'loading-container' }, [
+          h('div', { key: 'spinner', className: 'loading-spinner large' }),
+          h('p', { key: 'text' }, 'Cargando configuración...')
+        ])
+      ]);
+    }
+
+    if (error && !config) {
+      return h('div', { className: 'admin-config' }, [
+        h('div', { key: 'error', className: 'error-container' }, [
+          h('div', { key: 'icon', className: 'error-icon' }, '⚠️'),
+          h('h3', { key: 'title' }, 'Error al cargar configuración'),
+          h('p', { key: 'message' }, error),
+          h('button', {
+            key: 'retry',
+            onClick: fetchConfig,
+            className: 'retry-button'
+          }, 'Reintentar')
+        ])
+      ]);
+    }
+
+    return h('div', { className: 'admin-config' }, [
+      h('div', { key: 'header', className: 'config-header' }, [
+        h('div', { key: 'left', className: 'header-left' }, [
+          h('h2', { key: 'title' }, 'Gestión de Configuración'),
+          h('p', { key: 'subtitle' }, 'Modifica la configuración del faucet desde la interfaz web')
+        ]),
+        hasChanges && h('div', { key: 'actions', className: 'header-actions' }, [
+          h('button', {
+            key: 'preview',
+            className: 'preview-button',
+            onClick: () => setShowPreview(!showPreview)
+          }, showPreview ? 'Ocultar' : 'Vista Previa'),
+          h('button', {
+            key: 'reset',
+            className: 'reset-button',
+            onClick: resetConfig
+          }, 'Descartar Cambios'),
+          h('button', {
+            key: 'save',
+            className: 'save-button',
+            onClick: saveConfig,
+            disabled: saving || validationErrors.length > 0
+          }, saving ? 'Guardando...' : 'Guardar Cambios')
+        ])
+      ]),
+
+      error && h('div', { key: 'error-banner', className: 'error-banner' }, [
+        h('span', { key: 'message' }, `⚠️ ${error}`),
+        h('button', { key: 'close', onClick: () => setError(null) }, '✕')
+      ]),
+
+      validationErrors.length > 0 && h('div', { key: 'validation', className: 'validation-errors' }, [
+        h('h4', { key: 'title' }, 'Errores de Validación:'),
+        h('ul', { key: 'list' }, 
+          validationErrors.map((error, index) => 
+            h('li', { key: index }, error)
+          )
+        )
+      ]),
+
+      h('div', { key: 'layout', className: 'config-layout' }, [
+        h('div', { key: 'sidebar', className: 'config-sidebar' }, [
+          h('nav', { key: 'nav', className: 'config-nav' },
+            configSections.map(section =>
+              h('button', {
+                key: section.key,
+                className: `nav-item ${activeSection === section.key ? 'active' : ''}`,
+                onClick: () => setActiveSection(section.key)
+              }, [
+                h('span', { key: 'label', className: 'nav-label' }, section.label),
+                h('span', { key: 'desc', className: 'nav-description' }, section.description)
+              ])
+            )
+          )
+        ]),
+
+        h('div', { key: 'content', className: 'config-content' }, [
+          activeSection === 'basic' && h('div', { key: 'basic', className: 'config-section' }, [
+            h('h3', { key: 'title' }, 'Configuración General'),
+            h('p', { key: 'placeholder' }, 'Funcionalidad de configuración básica en desarrollo...')
+          ]),
+          activeSection === 'modules' && h('div', { key: 'modules', className: 'config-section' }, [
+            h('h3', { key: 'title' }, 'Gestión de Módulos'),
+            h('p', { key: 'placeholder' }, 'Funcionalidad de gestión de módulos en desarrollo...')
+          ]),
+          activeSection === 'advanced' && h('div', { key: 'advanced', className: 'config-section' }, [
+            h('h3', { key: 'title' }, 'Configuración Avanzada'),
+            h('p', { key: 'placeholder' }, 'Funcionalidad de configuración avanzada en desarrollo...')
+          ])
+        ])
+      ])
+    ]);
+  };
+
+  // Admin Reports Component
+  const AdminReports = ({ token }) => {
+    const [activeSection, setActiveSection] = useState('overview');
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [period, setPeriod] = useState('7d');
+    
+    // Estados para diferentes secciones
+    const [reportSummary, setReportSummary] = useState(null);
+    const [chartData, setChartData] = useState(null);
+    const [moduleReports, setModuleReports] = useState(null);
+    const [healthReport, setHealthReport] = useState(null);
+
+    const sections = [
+      { key: 'overview', label: '📊 Resumen General', icon: '📊' },
+      { key: 'charts', label: '📈 Gráficos', icon: '📈' },
+      { key: 'modules', label: '🧩 Módulos', icon: '🧩' },
+      { key: 'health', label: '💚 Salud del Sistema', icon: '💚' },
+      { key: 'export', label: '📤 Exportar Datos', icon: '📤' }
+    ];
+
+    const periods = [
+      { value: '24h', label: 'Últimas 24h' },
+      { value: '7d', label: 'Últimos 7 días' },
+      { value: '30d', label: 'Últimos 30 días' },
+      { value: '90d', label: 'Últimos 90 días' }
+    ];
+
+    useEffect(() => {
+      fetchData();
+    }, [token, activeSection, period]);
+
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        switch (activeSection) {
+          case 'overview':
+            await fetchReportSummary();
+            break;
+          case 'charts':
+            await fetchChartData();
+            break;
+          case 'modules':
+            await fetchModuleReports();
+            break;
+          case 'health':
+            await fetchHealthReport();
+            break;
+          case 'export':
+            // No necesita fetch, es solo UI
+            setLoading(false);
+            break;
+        }
+      } catch (error) {
+        setError('Error al cargar datos de reportes');
+        setLoading(false);
+      }
+    };
+
+    const fetchReportSummary = async () => {
+      try {
+        const response = await fetch(`/api/admin/reports/summary?period=${period}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          setReportSummary(data.data);
+        } else {
+          throw new Error(data.error?.message || 'Error al cargar resumen');
+        }
+      } catch (error) {
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchChartData = async () => {
+      try {
+        const response = await fetch(`/api/admin/reports/charts?period=${period}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          setChartData(data.data);
+        } else {
+          throw new Error(data.error?.message || 'Error al cargar gráficos');
+        }
+      } catch (error) {
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchModuleReports = async () => {
+      try {
+        const response = await fetch(`/api/admin/reports/modules?period=${period}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          setModuleReports(data.data);
+        } else {
+          throw new Error(data.error?.message || 'Error al cargar reportes de módulos');
+        }
+      } catch (error) {
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchHealthReport = async () => {
+      try {
+        const response = await fetch('/api/admin/reports/health', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          setHealthReport(data.data);
+        } else {
+          throw new Error(data.error?.message || 'Error al cargar reporte de salud');
+        }
+      } catch (error) {
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const exportData = async (type, format = 'json') => {
+      try {
+        const response = await fetch(`/api/admin/export/${type}${format === 'csv' ? '/csv' : ''}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          if (format === 'csv') {
+            // Descargar CSV
+            const blob = new Blob([data.data], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `faucet-${type}-${Date.now()}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+          } else {
+            // Descargar JSON
+            const blob = new Blob([JSON.stringify(data.data, null, 2)], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `faucet-${type}-${Date.now()}.json`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+          }
+        } else {
+          alert('Error al exportar datos: ' + (data.error?.message || 'Error desconocido'));
+        }
+      } catch (error) {
+        alert('Error al exportar datos: ' + error.message);
+      }
+    };
+
+    const getHealthColor = (score) => {
+      if (score >= 90) return '#10b981'; // Verde
+      if (score >= 70) return '#f59e0b'; // Amarillo
+      return '#ef4444'; // Rojo
+    };
+
+    const getHealthLabel = (score) => {
+      if (score >= 90) return 'Excelente';
+      if (score >= 70) return 'Bueno';
+      if (score >= 50) return 'Regular';
+      return 'Crítico';
+    };
+
+    if (loading) {
+      return h('div', { className: 'admin-reports' }, [
+        h('div', { key: 'loading', className: 'loading-container' }, [
+          h('div', { key: 'spinner', className: 'loading-spinner large' }),
+          h('p', { key: 'text' }, 'Cargando reportes y análisis...')
+        ])
+      ]);
+    }
+
+    return h('div', { className: 'admin-reports' }, [
+      h('div', { key: 'header', className: 'reports-header' }, [
+        h('div', { key: 'left', className: 'header-left' }, [
+          h('h2', { key: 'title' }, 'Reportes y Análisis'),
+          h('p', { key: 'subtitle' }, 'Análisis detallado del rendimiento y uso del faucet')
+        ]),
+        h('div', { key: 'controls', className: 'header-controls' }, [
+          activeSection !== 'health' && activeSection !== 'export' && h('select', {
+            key: 'period',
+            value: period,
+            onChange: (e) => setPeriod(e.target.value),
+            className: 'period-selector'
+          }, periods.map(p => h('option', { key: p.value, value: p.value }, p.label)))
+        ])
+      ]),
+
+      error && h('div', { key: 'error-banner', className: 'error-banner' }, [
+        h('span', { key: 'message' }, `⚠️ ${error}`),
+        h('button', { key: 'close', onClick: () => setError(null) }, '✕')
+      ]),
+
+      h('div', { key: 'layout', className: 'reports-layout' }, [
+        h('div', { key: 'sidebar', className: 'reports-sidebar' }, [
+          h('nav', { key: 'nav', className: 'reports-nav' },
+            sections.map(section =>
+              h('button', {
+                key: section.key,
+                className: `nav-item ${activeSection === section.key ? 'active' : ''}`,
+                onClick: () => setActiveSection(section.key)
+              }, [
+                h('span', { key: 'icon', className: 'nav-icon' }, section.icon),
+                h('span', { key: 'label', className: 'nav-label' }, section.label)
+              ])
+            )
+          )
+        ]),
+
+        h('div', { key: 'content', className: 'reports-content' }, [
+          // Resumen General
+          activeSection === 'overview' && reportSummary && h('div', { key: 'overview', className: 'reports-section' }, [
+            h('div', { key: 'summary-grid', className: 'summary-grid' }, [
+              h('div', { key: 'requests', className: 'summary-card' }, [
+                h('div', { key: 'icon', className: 'summary-icon' }, '📊'),
+                h('div', { key: 'content', className: 'summary-content' }, [
+                  h('h3', { key: 'title' }, 'Total Solicitudes'),
+                  h('div', { key: 'value', className: 'summary-value' }, reportSummary.totalRequests.toLocaleString()),
+                  h('div', { key: 'period', className: 'summary-period' }, reportSummary.period)
+                ])
+              ]),
+              h('div', { key: 'distributed', className: 'summary-card' }, [
+                h('div', { key: 'icon', className: 'summary-icon' }, '💰'),
+                h('div', { key: 'content', className: 'summary-content' }, [
+                  h('h3', { key: 'title' }, 'ETH Distribuido'),
+                  h('div', { key: 'value', className: 'summary-value' }, `${reportSummary.totalDistributed} ETH`),
+                  h('div', { key: 'period', className: 'summary-period' }, reportSummary.period)
+                ])
+              ]),
+              h('div', { key: 'users', className: 'summary-card' }, [
+                h('div', { key: 'icon', className: 'summary-icon' }, '👥'),
+                h('div', { key: 'content', className: 'summary-content' }, [
+                  h('h3', { key: 'title' }, 'Usuarios Únicos'),
+                  h('div', { key: 'value', className: 'summary-value' }, reportSummary.uniqueUsers.toLocaleString()),
+                  h('div', { key: 'period', className: 'summary-period' }, reportSummary.period)
+                ])
+              ]),
+              h('div', { key: 'success', className: 'summary-card' }, [
+                h('div', { key: 'icon', className: 'summary-icon' }, '✅'),
+                h('div', { key: 'content', className: 'summary-content' }, [
+                  h('h3', { key: 'title' }, 'Tasa de Éxito'),
+                  h('div', { key: 'value', className: 'summary-value' }, `${reportSummary.successRate.toFixed(1)}%`),
+                  h('div', { key: 'period', className: 'summary-period' }, reportSummary.period)
+                ])
+              ])
+            ]),
+            h('div', { key: 'details', className: 'summary-details' }, [
+              h('div', { key: 'detail-item', className: 'detail-item' }, [
+                h('span', { key: 'label' }, 'Cantidad promedio por claim:'),
+                h('span', { key: 'value' }, `${reportSummary.averageClaimAmount} ETH`)
+              ]),
+              h('div', { key: 'detail-item2', className: 'detail-item' }, [
+                h('span', { key: 'label' }, 'Hora pico de actividad:'),
+                h('span', { key: 'value' }, reportSummary.topHour)
+              ]),
+              h('div', { key: 'detail-item3', className: 'detail-item' }, [
+                h('span', { key: 'label' }, 'Día más activo:'),
+                h('span', { key: 'value' }, reportSummary.topDay)
+              ])
+            ])
+          ]),
+
+          // Gráficos
+          activeSection === 'charts' && h('div', { key: 'charts', className: 'reports-section' }, [
+            h('div', { key: 'chart-placeholder', className: 'chart-placeholder' }, [
+              h('div', { key: 'icon', className: 'placeholder-icon' }, '📈'),
+              h('h3', { key: 'title' }, 'Gráficos Interactivos'),
+              h('p', { key: 'message' }, 'Los gráficos interactivos estarán disponibles próximamente'),
+              chartData && h('div', { key: 'data-info', className: 'data-info' }, [
+                h('p', { key: 'info' }, `Datos disponibles para ${chartData.labels.length} períodos`),
+                h('p', { key: 'datasets' }, `${chartData.datasets.length} series de datos cargadas`)
+              ])
+            ])
+          ]),
+
+          // Módulos
+          activeSection === 'modules' && moduleReports && h('div', { key: 'modules', className: 'reports-section' }, [
+            h('div', { key: 'modules-grid', className: 'modules-grid' },
+              moduleReports.modules.map(module =>
+                h('div', { key: module.name, className: 'module-card' }, [
+                  h('div', { key: 'header', className: 'module-header' }, [
+                    h('h4', { key: 'name' }, module.name),
+                    h('div', { key: 'status', className: `module-status ${module.enabled ? 'enabled' : 'disabled'}` }, 
+                      module.enabled ? 'Activo' : 'Inactivo')
+                  ]),
+                  module.enabled && h('div', { key: 'stats', className: 'module-stats' }, [
+                    h('div', { key: 'processed', className: 'stat-item' }, [
+                      h('span', { key: 'label' }, 'Sesiones procesadas:'),
+                      h('span', { key: 'value' }, module.sessionsProcessed.toLocaleString())
+                    ]),
+                    h('div', { key: 'success', className: 'stat-item' }, [
+                      h('span', { key: 'label' }, 'Tasa de éxito:'),
+                      h('span', { key: 'value' }, `${module.successRate.toFixed(1)}%`)
+                    ]),
+                    h('div', { key: 'time', className: 'stat-item' }, [
+                      h('span', { key: 'label' }, 'Tiempo promedio:'),
+                      h('span', { key: 'value' }, `${module.averageProcessingTime.toFixed(0)}ms`)
+                    ])
+                  ])
+                ])
+              )
+            )
+          ]),
+
+          // Salud del Sistema
+          activeSection === 'health' && healthReport && h('div', { key: 'health', className: 'reports-section' }, [
+            h('div', { key: 'health-overview', className: 'health-overview' }, [
+              h('div', { key: 'score-card', className: 'health-score-card' }, [
+                h('div', { key: 'score-circle', className: 'health-score-circle', style: { borderColor: getHealthColor(healthReport.overallScore) } }, [
+                  h('div', { key: 'score', className: 'health-score' }, healthReport.overallScore),
+                  h('div', { key: 'label', className: 'health-label' }, getHealthLabel(healthReport.overallScore))
+                ])
+              ]),
+              h('div', { key: 'metrics', className: 'health-metrics' }, [
+                h('div', { key: 'metric1', className: 'health-metric' }, [
+                  h('span', { key: 'label' }, 'Uptime:'),
+                  h('span', { key: 'value' }, `${healthReport.uptime}%`)
+                ]),
+                h('div', { key: 'metric2', className: 'health-metric' }, [
+                  h('span', { key: 'label' }, 'Uso de memoria:'),
+                  h('span', { key: 'value' }, `${healthReport.memoryUsage}%`)
+                ]),
+                h('div', { key: 'metric3', className: 'health-metric' }, [
+                  h('span', { key: 'label' }, 'Tiempo de respuesta:'),
+                  h('span', { key: 'value' }, `${healthReport.responseTime}ms`)
+                ]),
+                h('div', { key: 'metric4', className: 'health-metric' }, [
+                  h('span', { key: 'label' }, 'Tasa de error:'),
+                  h('span', { key: 'value' }, `${healthReport.errorRate.toFixed(1)}%`)
+                ])
+              ])
+            ]),
+            h('div', { key: 'services', className: 'services-status' }, [
+              h('h4', { key: 'title' }, 'Estado de Servicios'),
+              h('div', { key: 'services-grid', className: 'services-grid' },
+                healthReport.services.map(service =>
+                  h('div', { key: service.name, className: 'service-card' }, [
+                    h('div', { key: 'name', className: 'service-name' }, service.name),
+                    h('div', { key: 'status', className: `service-status ${service.status}` }, service.status),
+                    h('div', { key: 'uptime', className: 'service-uptime' }, `${service.uptime}% uptime`)
+                  ])
+                )
+              )
+            ])
+          ]),
+
+          // Exportar Datos
+          activeSection === 'export' && h('div', { key: 'export', className: 'reports-section' }, [
+            h('div', { key: 'export-grid', className: 'export-grid' }, [
+              h('div', { key: 'stats', className: 'export-card' }, [
+                h('h4', { key: 'title' }, '📊 Estadísticas'),
+                h('p', { key: 'desc' }, 'Exportar datos de estadísticas y métricas del faucet'),
+                h('div', { key: 'buttons', className: 'export-buttons' }, [
+                  h('button', { key: 'json', onClick: () => exportData('stats', 'json') }, 'JSON'),
+                  h('button', { key: 'csv', onClick: () => exportData('stats', 'csv') }, 'CSV')
+                ])
+              ]),
+              h('div', { key: 'sessions', className: 'export-card' }, [
+                h('h4', { key: 'title' }, '🔗 Sesiones'),
+                h('p', { key: 'desc' }, 'Exportar datos de sesiones de usuarios'),
+                h('div', { key: 'buttons', className: 'export-buttons' }, [
+                  h('button', { key: 'json', onClick: () => exportData('sessions', 'json') }, 'JSON'),
+                  h('button', { key: 'csv', onClick: () => exportData('sessions', 'csv') }, 'CSV')
+                ])
+              ]),
+              h('div', { key: 'alerts', className: 'export-card' }, [
+                h('h4', { key: 'title' }, '🚨 Alertas'),
+                h('p', { key: 'desc' }, 'Exportar historial de alertas del sistema'),
+                h('div', { key: 'buttons', className: 'export-buttons' }, [
+                  h('button', { key: 'json', onClick: () => exportData('alerts', 'json') }, 'JSON')
+                ])
+              ]),
+              h('div', { key: 'users', className: 'export-card' }, [
+                h('h4', { key: 'title' }, '👥 Usuarios'),
+                h('p', { key: 'desc' }, 'Exportar datos de usuarios y direcciones'),
+                h('div', { key: 'buttons', className: 'export-buttons' }, [
+                  h('button', { key: 'json', onClick: () => exportData('users', 'json') }, 'JSON')
+                ])
+              ])
+            ])
+          ])
+        ])
+      ])
+    ]);
+  };
+
+  // Admin App Component
+  const AdminApp = () => {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [token, setToken] = useState(null);
+    const [user, setUser] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [currentView, setCurrentView] = useState('dashboard');
+
+    useEffect(() => {
+      const savedToken = localStorage.getItem('adminToken');
+      const savedUser = localStorage.getItem('adminUser');
+
+      if (savedToken && savedUser) {
+        try {
+          const userData = JSON.parse(savedUser);
+          setToken(savedToken);
+          setUser(userData);
+          setIsAuthenticated(true);
+        } catch (error) {
+          localStorage.removeItem('adminToken');
+          localStorage.removeItem('adminUser');
+        }
+      }
+
+      setIsLoading(false);
+    }, []);
+
+    const handleLogin = (newToken, userData) => {
+      const userInfo = {
+        username: userData.username,
+        loginTime: userData.loginTime || Date.now(),
+      };
+
+      setToken(newToken);
+      setUser(userInfo);
+      setIsAuthenticated(true);
+
+      localStorage.setItem('adminToken', newToken);
+      localStorage.setItem('adminUser', JSON.stringify(userInfo));
+    };
+
+    const handleLogout = () => {
+      setToken(null);
+      setUser(null);
+      setIsAuthenticated(false);
+      setCurrentView('dashboard');
+
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('adminUser');
+    };
+
+    const handleNavigate = (view) => {
+      setCurrentView(view);
+    };
+
+    const handleError = (error) => {
+      console.error('Admin error:', error);
+    };
+
+    const renderCurrentView = () => {
+      switch (currentView) {
+        case 'dashboard':
+          return h(AdminDashboard, { key: 'dashboard', token });
+        case 'config':
+          return h(AdminConfig, { key: 'config', token });
+        case 'users':
+          return h(AdminUsers, { key: 'users', token });
+        case 'reports':
+          return h(AdminReports, { key: 'reports', token });
+        case 'logs':
+        case 'alerts':
+        case 'modules':
+          return h('div', { key: 'placeholder', style: { padding: '40px', textAlign: 'center' } }, [
+            h('h3', { key: 'title' }, `Funcionalidad de ${currentView} en desarrollo`),
+            h('p', { key: 'message' }, 'Esta sección estará disponible próximamente')
+          ]);
+        default:
+          return h(AdminDashboard, { key: 'dashboard', token });
+      }
+    };
+
+    if (isLoading) {
+      return h('div', { className: 'admin-app' }, [
+        h('div', { key: 'loading', className: 'admin-loading' }, [
+          h('div', { key: 'spinner', className: 'loading-spinner' }),
+          h('p', { key: 'text' }, 'Cargando Admin Dashboard...')
+        ])
+      ]);
+    }
+
+    if (!isAuthenticated || !token || !user) {
+      return h('div', { className: 'admin-app' }, [
+        h(AdminLogin, { key: 'login', onLogin: handleLogin, onError: handleError })
+      ]);
+    }
+
+    return h('div', { className: 'admin-app' }, [
+      h(AdminLayout, { 
+        key: 'layout', 
+        user, 
+        token, 
+        onLogout: handleLogout, 
+        currentView, 
+        onNavigate: handleNavigate 
+      }, [
+        renderCurrentView()
+      ])
+    ]);
+  };
+
+  // Initialize the admin app
+  function initializeAdmin() {
+    const root = createRoot(document.getElementById('admin-root'));
+    root.render(h(AdminApp));
+  }
+
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeAdmin);
+  } else {
+    initializeAdmin();
+  }
+
+})();
