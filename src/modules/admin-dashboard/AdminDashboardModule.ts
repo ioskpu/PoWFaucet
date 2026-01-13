@@ -51,39 +51,108 @@ export class AdminDashboardModule extends BaseModule<IAdminDashboardConfig> {
     // Registrar todos los endpoints de admin
     webApi.registerApiEndpoint("admin/login", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
     webApi.registerApiEndpoint("admin/logout", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    
+    // Estadísticas
     webApi.registerApiEndpoint("admin/stats", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
     webApi.registerApiEndpoint("admin/stats/realtime", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
     webApi.registerApiEndpoint("admin/stats/refresh", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    
+    // Alertas
     webApi.registerApiEndpoint("admin/alerts", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
     webApi.registerApiEndpoint("admin/alerts/all", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
     webApi.registerApiEndpoint("admin/alerts/acknowledge", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
     webApi.registerApiEndpoint("admin/alerts/cleanup", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    
+    // Sesiones
     webApi.registerApiEndpoint("admin/sessions", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
     webApi.registerApiEndpoint("admin/sessions/admin", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    
+    // Configuración
     webApi.registerApiEndpoint("admin/config", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    webApi.registerApiEndpoint("admin/config/validate", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    webApi.registerApiEndpoint("admin/config/backup", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    webApi.registerApiEndpoint("admin/config/restore", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    
+    // Logs
     webApi.registerApiEndpoint("admin/logs", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    webApi.registerApiEndpoint("admin/logs/download", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    webApi.registerApiEndpoint("admin/logs/clear", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    
+    // Usuarios
     webApi.registerApiEndpoint("admin/users", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    webApi.registerApiEndpoint("admin/users/blacklist", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    webApi.registerApiEndpoint("admin/users/whitelist", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    webApi.registerApiEndpoint("admin/users/sessions", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    webApi.registerApiEndpoint("admin/users/sessions/terminate", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    webApi.registerApiEndpoint("admin/users/top", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    
+    // Módulos
     webApi.registerApiEndpoint("admin/modules", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    webApi.registerApiEndpoint("admin/modules/reload", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    webApi.registerApiEndpoint("admin/modules/config", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    
+    // Exportación
+    webApi.registerApiEndpoint("admin/export/stats", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    webApi.registerApiEndpoint("admin/export/stats/csv", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    webApi.registerApiEndpoint("admin/export/sessions", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    webApi.registerApiEndpoint("admin/export/sessions/csv", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    webApi.registerApiEndpoint("admin/export/alerts", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
+    webApi.registerApiEndpoint("admin/export/users", (req, url, body) => this.adminAPI.handleApiRequest(req, url, body));
   }
 
   private unregisterApiEndpoints(): void {
     const webApi = ServiceManager.GetService(FaucetWebApi);
     
+    // Desregistrar endpoints básicos
     webApi.removeApiEndpoint("admin/login");
     webApi.removeApiEndpoint("admin/logout");
+    
+    // Estadísticas
     webApi.removeApiEndpoint("admin/stats");
     webApi.removeApiEndpoint("admin/stats/realtime");
     webApi.removeApiEndpoint("admin/stats/refresh");
+    
+    // Alertas
     webApi.removeApiEndpoint("admin/alerts");
     webApi.removeApiEndpoint("admin/alerts/all");
     webApi.removeApiEndpoint("admin/alerts/acknowledge");
     webApi.removeApiEndpoint("admin/alerts/cleanup");
+    
+    // Sesiones
     webApi.removeApiEndpoint("admin/sessions");
     webApi.removeApiEndpoint("admin/sessions/admin");
+    
+    // Configuración
     webApi.removeApiEndpoint("admin/config");
+    webApi.removeApiEndpoint("admin/config/validate");
+    webApi.removeApiEndpoint("admin/config/backup");
+    webApi.removeApiEndpoint("admin/config/restore");
+    
+    // Logs
     webApi.removeApiEndpoint("admin/logs");
+    webApi.removeApiEndpoint("admin/logs/download");
+    webApi.removeApiEndpoint("admin/logs/clear");
+    
+    // Usuarios
     webApi.removeApiEndpoint("admin/users");
+    webApi.removeApiEndpoint("admin/users/blacklist");
+    webApi.removeApiEndpoint("admin/users/whitelist");
+    webApi.removeApiEndpoint("admin/users/sessions");
+    webApi.removeApiEndpoint("admin/users/sessions/terminate");
+    webApi.removeApiEndpoint("admin/users/top");
+    
+    // Módulos
     webApi.removeApiEndpoint("admin/modules");
+    webApi.removeApiEndpoint("admin/modules/reload");
+    webApi.removeApiEndpoint("admin/modules/config");
+    
+    // Exportación
+    webApi.removeApiEndpoint("admin/export/stats");
+    webApi.removeApiEndpoint("admin/export/stats/csv");
+    webApi.removeApiEndpoint("admin/export/sessions");
+    webApi.removeApiEndpoint("admin/export/sessions/csv");
+    webApi.removeApiEndpoint("admin/export/alerts");
+    webApi.removeApiEndpoint("admin/export/users");
   }
 
   private validateConfig(): void {
