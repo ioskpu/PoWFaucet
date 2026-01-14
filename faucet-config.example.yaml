@@ -198,11 +198,14 @@ modules:
       lowBalance:
         enabled: true
         threshold: 1000000000000000000  # 1 ETH
+        notification: ["dashboard"]
       highActivity:
         enabled: true
         threshold: 100  # requests per hour
+        notification: ["dashboard"]
       systemErrors:
         enabled: true
+        notification: ["dashboard"]
 
     # UI configuration
     ui:
