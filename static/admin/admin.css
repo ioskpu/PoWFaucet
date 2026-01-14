@@ -154,6 +154,7 @@
   border-right: 1px solid #2d2d44;
   display: flex;
   flex-direction: column;
+  overflow: hidden; /* Evita que las sombras se salgan del sidebar */
 }
 
 .sidebar-header {
@@ -176,6 +177,7 @@
 .sidebar-nav {
   flex: 1;
   padding: 20px 0;
+  overflow-y: auto; /* Permite scroll si hay muchos items */
 }
 
 .nav-item {

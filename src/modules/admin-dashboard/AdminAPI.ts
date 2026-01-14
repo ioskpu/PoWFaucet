@@ -10,6 +10,7 @@ import { FaucetProcess, FaucetLogLevel } from "../../common/FaucetProcess.js";
 import { FaucetDatabase } from "../../db/FaucetDatabase.js";
 import { SessionManager } from "../../session/SessionManager.js";
 import { ModuleManager } from "../ModuleManager.js";
+import { faucetConfig } from "../../config/FaucetConfig.js";
 
 export class AdminAPI {
   private config: IAdminDashboardConfig;
@@ -1226,20 +1227,29 @@ export class AdminAPI {
    * Obtiene configuración segura (sin datos sensibles)
    */
   private getSafeConfig(): any {
-    const safeConfig = { ...this.config };
+    const safeConfig = {
+      faucetTitle: faucetConfig.faucetTitle,
+      serverPort: faucetConfig.serverPort,
+      faucetCoinSymbol: faucetConfig.faucetCoinSymbol,
+      faucetCoinType: faucetConfig.faucetCoinType,
+      minClaim: faucetConfig.minDropAmount,
+      maxClaim: faucetConfig.maxDropAmount,
+      sessionTimeout: faucetConfig.sessionTimeout,
+      ethChainId: faucetConfig.ethChainId,
+      ethRpcHost: faucetConfig.ethRpcHost ? "[CONFIGURED]" : null,
+      buildSeoIndex: faucetConfig.buildSeoIndex,
+      claimTimeout: 600, // Default value
+      modules: {}
+    };
     
-    // Remover datos sensibles
-    if (safeConfig.adminUsers) {
-      safeConfig.adminUsers = safeConfig.adminUsers.map(user => ({
-        username: user.username,
-        permissions: user.permissions,
-        email: user.email,
-        lastLogin: user.lastLogin,
-        passwordHash: "[HIDDEN]" // No exponer el hash
-      }));
+    // Agregar información de módulos desde la configuración
+    if (faucetConfig.modules) {
+      for (const [moduleName, moduleConfig] of Object.entries(faucetConfig.modules)) {
+        safeConfig.modules[moduleName] = {
+          enabled: (moduleConfig as any)?.enabled || false
+        };
+      }
     }
-    
-    delete (safeConfig as any).sessionSecret;
     
     return safeConfig;
   }
