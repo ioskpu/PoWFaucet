@@ -214,40 +214,9 @@ modules:
     reports:
       retention: 90  # days
       exportFormat: ["json", "csv"]
-      
-      highActivity:
-        enabled: true
-        threshold: 100  # requests per hour
-        notification: ["dashboard"]
-        message: "Unusually high activity detected"
-      
-      systemErrors:
-        enabled: true
-        notification: ["dashboard", "email"]
-        message: "System errors detected"
-      
-      failedTransactions:
-        enabled: true
-        threshold: 10  # failed transactions per hour
-        notification: ["dashboard"]
-        message: "High number of failed transactions"
 
-    # UI configuration
-    ui:
-      refreshInterval: 5000  # 5 seconds
-      theme: "dark"  # dark, light, auto
-      language: "es"  # es, en
-      itemsPerPage: 20
-
-    # reports configuration
-    reports:
-      retention: 90  # days
-      autoExport: false
-      exportFormat: ["csv", "json"]
-      # emailReports: ["admin@example.com"]
-
-    # security configuration
-    security:
+  ## GitHub Login
+  github:
       maxLoginAttempts: 5
       lockoutDuration: 900  # 15 minutes
       requireHTTPS: true
