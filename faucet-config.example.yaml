@@ -1,4 +1,5 @@
 # PoWFaucet config (example)
+# Updated: 2026-01-14 - Admin Dashboard enabled
 version: 2
 
 ### General Settings
