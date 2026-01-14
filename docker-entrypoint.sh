@@ -33,6 +33,12 @@ if [ -n "$RAILWAY_PUBLIC_DOMAIN" ]; then
   sed -i "s|#uri:.*|uri: \"https://$RAILWAY_PUBLIC_DOMAIN\"|g" $CONFIG_FILE
 fi
 
+# Si existe ADMIN_SESSION_SECRET, actualizar admin-dashboard config
+if [ -n "$ADMIN_SESSION_SECRET" ]; then
+  echo "Updating admin session secret..."
+  sed -i "s|sessionSecret:.*\"\${ADMIN_SESSION_SECRET}\"|sessionSecret: \"$ADMIN_SESSION_SECRET\"|g" $CONFIG_FILE
+fi
+
 # Si existe PORT (Railway lo asigna), actualizar
 if [ -n "$PORT" ]; then
   echo "Updating port to: $PORT"

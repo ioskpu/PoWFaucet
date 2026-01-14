@@ -172,31 +172,48 @@ modules:
   ## Admin Dashboard
   admin-dashboard:
     # enable / disable admin dashboard
-    enabled: false
+    enabled: true
 
     # admin users configuration
     adminUsers:
       - username: "admin"
-        # password hash (use bcrypt to generate: node -e "console.log(require('bcrypt').hashSync('your-password', 10))")
-        passwordHash: "$2b$10$example.hash.replace.with.real.hash"
+        # password hash generated with: node scripts/generate-admin-password.js
+        passwordHash: "$2b$10$ubxntsYHB9P5unEc8rIbN.ix/jft2Lr9ALpnm3EK/SmVr5LCv5zyO"
         permissions: ["all"]
         email: "admin@example.com"
-      - username: "monitor"
-        passwordHash: "$2b$10$example.hash.replace.with.real.hash"
-        permissions: ["read", "stats", "alerts"]
-        email: "monitor@example.com"
 
     # session configuration
-    sessionSecret: "change-this-secret-key-to-something-random"
+    sessionSecret: "${ADMIN_SESSION_SECRET}"
     sessionExpiration: 3600  # 1 hour
+
+    # security configuration
+    security:
+      maxLoginAttempts: 5
+      lockoutDuration: 900  # 15 minutes
+      requireHTTPS: false
+      adminPath: "/admin"
 
     # alert configuration
     alerts:
       lowBalance:
         enabled: true
         threshold: 1000000000000000000  # 1 ETH
-        notification: ["dashboard", "email"]
-        message: "Faucet balance is running low"
+      highActivity:
+        enabled: true
+        threshold: 100  # requests per hour
+      systemErrors:
+        enabled: true
+
+    # UI configuration
+    ui:
+      refreshInterval: 30000  # 30 seconds
+      theme: "dark"
+      language: "es"
+
+    # reports configuration
+    reports:
+      retention: 90  # days
+      exportFormat: ["json", "csv"]
       
       highActivity:
         enabled: true
