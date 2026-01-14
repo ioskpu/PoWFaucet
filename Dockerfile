@@ -25,6 +25,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates bash
 RUN update-ca-certificates
 COPY --from=build-server-env /build/bundle ./bundle
+COPY --from=build-server-env /build/node_modules ./node_modules
 COPY --from=build-client-env /build/static ./static
 COPY ./faucet-config.example.yaml ./faucet-config.yaml
 COPY ./docker-entrypoint.sh .
