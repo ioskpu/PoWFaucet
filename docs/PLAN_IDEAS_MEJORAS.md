@@ -33,6 +33,7 @@ PoWFaucet es un faucet modularizado para cadenas EVM que combina múltiples mét
 | 15 | Sistema de Notificaciones | ⏳ Pendiente | - |
 | 16 | Documentación Completa de Módulos | ⏳ Pendiente | - |
 | 17 | Mejoras UX - Auto-completar Dirección SIWE | ⏳ Pendiente | - |
+| 18 | Faucet con Captcha Remunerado (hCaptcha) | ⏳ Pendiente | - |
 
 **Leyenda:** ✅ Completado | 🔄 En Progreso | ⏳ Pendiente
 
@@ -323,6 +324,63 @@ docs/
 
 ---
 
+### 💰 18. Faucet con Captcha Remunerado (hCaptcha)
+
+**Descripción:** Implementar hCaptcha como mecanismo de monetización para autofinanciar el faucet.
+
+**Cómo funciona:**
+- hCaptcha paga pequeñas cantidades por cada captcha resuelto (~$0.0001-0.0003 por captcha)
+- Los usuarios resuelven captchas para obtener ETH testnet
+- El faucet recibe pagos de hCaptcha
+- Esos pagos se usan para recargar el balance del faucet
+
+**Características propuestas:**
+- Integración con hCaptcha Publisher Account
+- Dashboard para ver ganancias de hCaptcha
+- Sistema automático de recarga cuando balance < umbral
+- Configuración de dificultad de captcha según demanda
+- Opción de captcha + PoW para mayor protección
+
+**Beneficios:**
+- **Sostenibilidad:** El faucet se autofinancia parcialmente
+- **Anti-spam:** Captcha previene bots
+- **Sin costo:** No requiere inversión adicional
+- **Escalable:** Más usuarios = más ingresos
+
+**Implementación técnica:**
+```yaml
+# faucet-config.yaml
+modules:
+  captcha:
+    enabled: true
+    provider: "hcaptcha"
+    siteKey: "YOUR_SITE_KEY"
+    secret: "YOUR_SECRET_KEY"
+    # Nuevo: configuración de monetización
+    monetization:
+      enabled: true
+      publisherAccount: "YOUR_PUBLISHER_ID"
+      autoRefill: true
+      refillThreshold: 0.1  # ETH
+      refillAmount: 0.5     # ETH
+```
+
+**Estimación de ingresos:**
+- 100 usuarios/día × $0.0002/captcha = $0.02/día = $7.30/mes
+- 1000 usuarios/día = $73/mes
+- Suficiente para comprar ETH testnet de otros faucets o cubrir costos de servidor
+
+**Complejidad:** Baja (hCaptcha ya está integrado, solo falta la parte de monetización)  
+**Prioridad:** Alta (sostenibilidad del proyecto)
+
+**Próximos pasos:**
+1. Crear cuenta Publisher en hCaptcha
+2. Implementar tracking de ganancias
+3. Crear script de auto-recarga
+4. Agregar métricas al admin dashboard
+
+---
+
 ## Mejoras Técnicas Propuestas
 
 ### 🗄️ A. Migración a PostgreSQL como Opción
@@ -358,6 +416,7 @@ docs/
 | Dashboard Admin | Alto | Alto | ⭐⭐⭐ |
 | Métricas Prometheus | Alto | Bajo | ⭐⭐⭐ |
 | Instant Claim | Alto | Bajo | ⭐⭐⭐ |
+| Captcha Remunerado | Alto | Bajo | ⭐⭐⭐ |
 | API REST Documentada | Medio | Bajo | ⭐⭐ |
 | Auth Web3 (SIWE) | Alto | Medio | ⭐⭐ |
 | Discord/Telegram Bot | Medio | Medio | ⭐⭐ |
