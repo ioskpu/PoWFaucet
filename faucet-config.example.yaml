@@ -215,15 +215,6 @@ modules:
       retention: 90  # days
       exportFormat: ["json", "csv"]
 
-  ## GitHub Login
-  github:
-      maxLoginAttempts: 5
-      lockoutDuration: 900  # 15 minutes
-      requireHTTPS: true
-      csrfProtection: true
-      sessionSecure: true
-      adminPath: "/admin"  # custom admin path
-
   ## ENS Name
   ensname:
     enabled: true
