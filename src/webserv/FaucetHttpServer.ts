@@ -138,6 +138,10 @@ export class FaucetHttpServer {
               else
                 this.staticServer.serveFile("/index.html", 200, {}, req, rsp);
               break;
+            case "/admin":
+            case "/admin/":
+              this.staticServer.serveFile("/admin/admin.html", 200, {}, req, rsp);
+              break;
             default:
               let pathname = decodeURI(new URL(req.url, 'http://localhost').pathname);
               this.staticServer.servePath(pathname, 200, this.getCorsHeaders(req), req, rsp, function() {});
