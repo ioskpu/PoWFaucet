@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AdminLogin } from './AdminLogin';
 import { AdminLayout } from './AdminLayout';
 import { AdminDashboard } from './AdminDashboard';
+import { AdminConfig } from './AdminConfig';
 import './AdminApp.css';
 
 interface AdminUser {
@@ -14,6 +15,7 @@ export const AdminApp: React.FC = () => {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<AdminUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeSection, setActiveSection] = useState('dashboard');
 
   // Verificar si hay una sesión guardada al cargar
   useEffect(() => {
@@ -66,6 +68,32 @@ export const AdminApp: React.FC = () => {
     // Aquí podrías mostrar notificaciones de error
   };
 
+  const renderContent = () => {
+    if (!token) return null;
+
+    switch (activeSection) {
+      case 'dashboard':
+        return <AdminDashboard token={token} />;
+      case 'config':
+        return <AdminConfig token={token} />;
+      case 'stats':
+      case 'alerts':
+      case 'users':
+      case 'modules':
+      case 'logs':
+      case 'export':
+        return (
+          <div className="coming-soon">
+            <div className="coming-soon-icon">🚧</div>
+            <h2>Funcionalidad en Desarrollo</h2>
+            <p>La sección "{activeSection}" estará disponible próximamente.</p>
+          </div>
+        );
+      default:
+        return <AdminDashboard token={token} />;
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="admin-app">
@@ -87,8 +115,14 @@ export const AdminApp: React.FC = () => {
 
   return (
     <div className="admin-app">
-      <AdminLayout user={user} token={token} onLogout={handleLogout}>
-        <AdminDashboard token={token} />
+      <AdminLayout 
+        user={user} 
+        token={token} 
+        onLogout={handleLogout}
+        activeSection={activeSection}
+        onSectionChange={setActiveSection}
+      >
+        {renderContent()}
       </AdminLayout>
     </div>
   );

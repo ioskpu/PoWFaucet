@@ -11,12 +11,20 @@ interface AdminLayoutProps {
   token: string;
   onLogout: () => void;
   children: React.ReactNode;
+  activeSection: string;
+  onSectionChange: (section: string) => void;
 }
 
-export const AdminLayout: React.FC<AdminLayoutProps> = ({ user, token, onLogout, children }) => {
+export const AdminLayout: React.FC<AdminLayoutProps> = ({ 
+  user, 
+  token, 
+  onLogout, 
+  children,
+  activeSection,
+  onSectionChange
+}) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [activeSection, setActiveSection] = useState('dashboard');
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -90,7 +98,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ user, token, onLogout,
             <button
               key={item.id}
               className={`nav-item ${activeSection === item.id ? 'active' : ''} ${!item.active ? 'disabled' : ''}`}
-              onClick={() => item.active && setActiveSection(item.id)}
+              onClick={() => item.active && onSectionChange(item.id)}
               disabled={!item.active}
               title={sidebarCollapsed ? item.label : ''}
             >
